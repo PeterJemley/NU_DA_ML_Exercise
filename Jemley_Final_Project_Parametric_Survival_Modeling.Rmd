@@ -812,11 +812,25 @@ print(anova(f.approx, test = 'Chisq', ss = FALSE), size = 'tsz')
 ```
 
 # The final equation on which the nomogram is based:
-$$ E(Z) = X\beta,\ \ where$$
-$$ X\hat{\beta}=$$
-$$ -2.51 \\-1.94[{\rm Coma}]-1.75[{\rm MOSF\ w/Malig}]\\ $$
+$$E(Z) = X\beta,\ where$$
 
+$$X\hat{\beta}=-2.51 -1.94[{\rm Coma}]-1.75[{\rm MOSF\ w/Malig}] + 0.068{\rm meanbp}_{+}$$
+$$-3.08\!\times\!10^{-5}({\rm meanbp}-41.8)^{3}+7.9\!\times\!10^{-5  }({\rm meanbp}-61)_{+}^{3}$$ 
 
+$$-4.91\!\times\!10^{-5}({\rm meanbp}-73)_{+}^{3}+2.61\!\times\!10^{-6 }({\rm meanbp}-109)_{+}^{3}$$
+
+$$-1.7\!\times\!10^{-6 }({\rm meanbp}-135)_{+}^{3}-0.553{\rm crea}-0.229({\rm crea}-0.6)_{+}^{3}$$
+$$+0.45  ({\rm crea}-1.1)_{+}^{3}-0.233({\rm crea}-1.94)_{+}^{3}+0.0131({\rm crea}-7.32)_{+}^{3}$$
+$$-0.0165  {\rm age}-1.13\!\times\!10^{-5}({\rm age} -28.5)_{+}^{3}+4.05\!\times\!10^{-5 }({\rm age}-49.5)_{+}^{3}$$
+$$-2.15\!\times\!10^{-5}({\rm age}-63.7)_{+}^{3}-2.68\!\times\!10^{-5}({\rm age}-72.7)_{+}^{3}+1.9\!\times\!10^{-5  }({\rm age}-85.6)_{+}^{3}$$
+$$-0.0136  {\rm hrt}+6.09\!\times\!10^{-7 }({\rm hrt}-60)_{+}^{3}-1.68\!\times\!10^{-6}({\rm hrt}-111)_{+}^{3}$$
+$$+1.07\!\times\!10^{-6 }({\rm hrt}-140)_{+}^{3}-0.0135\:{\rm scoma}+ 0.0161   {\rm pafi.i}$$
+$$-4.77\!\times\!10^{-7}({\rm pafi.i}-88)_{+}^{3}+9.11\!\times\!10^{-7 }({\rm pafi.i}-167)_{+}^{3}$$
+$$-5.02\!\times\!10^{-7}({\rm pafi.i}-276)_{+}^{3}+6.76\!\times\!10^{-8 }({\rm pafi.i}-426)_{+}^{3}-0.369\:{\rm adlsc}_{+}$$
+$$+0.0409\:{\rm adlsc}^{2}+ 0.0394{\rm resp}-9.11\!\times\!10^{-5}({\rm resp}-10)_{+}^{3}$$
+$$+0.000176 ({\rm resp}-24)_{+}^{3}-8.5\times\!10^{-5 }({\rm resp}-39)_{+}^{3}  $$
+$$and\ \ [c]=1\ \ if\ \ subject\ \ is\ \ in\ \ group\ \ (c), $$
+$$\ \ 0\ \ otherwise\ \ (x)_{+}=x\ \ if \ \ x > 0,\ \ 0\ \ otherwise$$
 
 # Getting a simpler representation of the model by applying the nomogram() function to the approximate model
 \begin{tcolorbox}[width=\textwidth]
