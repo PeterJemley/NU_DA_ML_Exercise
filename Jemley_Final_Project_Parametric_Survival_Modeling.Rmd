@@ -181,6 +181,17 @@ death, sex, death in hospital (hospdead), days study entry to discharge (slos), 
 3. For mean arterial blood pressure, a numeric variable.\\
 4. For heart rate, a numeric variable. As plotted, heart rate appears to have outliers. These rates are not unusual for patients with supraventricular #tachycardia, however.\\
 5. For respiration rate, day 3, a numeric variable. Tachypnea, rapid breathing, is also not unusual in acutely-ill patients. The patient with the rate which is the outlier died.\\
+6. For temperature (celcius), day 3, a numeric variable. The one outlier was 
+# also associated with patient who died.\\
+7. # For pafi, a measure of oxygenation of tissues, a numeric variable. The greatest outlier is over the reference range (5 - 800), but this value should remain as it may in fact be an accurate measurement.\\
+8. For serum albumin (alb), a numeric variable. All of these values are within the reference range for acutely-ill patients.\\
+9. For bilirubin day 3 (bili), a numeric variable. Although these outliers are extreme, they are noted in the medical literature for acutely-ill patients.\\
+10. For serum creatinine day 3 (crea), a numeric variable. These outliers indicate renal failure, and would be part of the Multiple Organ System Failure disease group.\\
+11. For serum sodium day 3 (sod), a numeric variable. These outliers are also within the reference range for acutely-ill patients.\\
+12. For serum pH arterial day 3 (ph), a numeric variable. These outliers are also within the reference range for acutely-ill patients.\\
+13. For glucose day 3 (glucose), a numeric variable. These outliers are within the reference range for diabetic patients.\\
+14. For blood urea nitrogen day 3 (bun), a numeric variable. These outliers are also within the reference range for acutely-ill patients.\\
+15. For urine output day 3 (urine), a numeric variable. The outliers are excessive, but appear in the medical literature.
 \end{tcolorbox}
 ```{r}
 # 1
@@ -198,46 +209,34 @@ boxplot(ac$hrt, xlab = "Heart Rate")
 # 5
 boxplot(ac$resp, xlab = "Respiration")
 
-# For temperature (celcius), day 3, a numeric variable. The one outlier was 
-# also associated with patient who died.
+# 6
 boxplot(ac$temp, xlab = "Temperature")
 
-# For pafi, a measure of oxygenation of tissues, a numeric variable. The 
-# greatest outlier is over the reference range (5 - 800), but this value 
-# should remain as it may in fact be an accurate measurement. 
+# 7
 boxplot(ac$pafi, xlab = "PAFI")
 
-# For serum albumin (alb), a numeric variable. All of these values are within 
-# the reference range for acutely-ill patients.
+# 8
 boxplot(ac$alb, xlab = "Albumin")
 
-# For bilirubin day 3 (bili), a numeric variable. Although these outliers are 
-# extreme, they are noted in the medical literature for acutely-ill patients.
+# 9
 boxplot(ac$bili, xlab = "Bilirubin")
 
-# For serum creatinine day 3 (crea), a numeric variable. These outliers 
-# indicate renal failure, and would be part of the Multiple Organ System 
-# Failure disease group.
+# 10
 boxplot(ac$crea, xlab = "Serum Creatinine")
 
-# For serum sodium day 3 (sod), a numeric variable. These outliers are also
-# within the reference range for acutely-ill patients.
+# 11
 boxplot(ac$sod, xlab = "Serum Sodium")
 
-# For serum pH arterial day 3 (ph), a numeric variable. These outliers are
-# also within the reference range for acutely-ill patients.
+# 12
 boxplot(ac$ph, xlab = "pH")
 
-# For glucose day 3 (glucose), a numeric variable. These outliers are within
-# the reference range for diabetic patients.
+# 13
 boxplot(ac$glucose, xlab = "Glucose")
 
-# For blood urea nitrogen day 3 (bun), a numeric variable. These outliers are
-# also within the reference range for acutely-ill patients.
+# 14
 boxplot(ac$bun, xlab = "Blood Urea Nitrogen")
 
-# For urine output day 3 (urine), a numeric variable. The outliers are
-# excessive, but appear in the medical literature.
+# 15
 boxplot(ac$urine, xlab = "Urine Output")
 ```
 
@@ -249,49 +248,44 @@ When the response variable is the time until an event, subjects not followed lon
 
 To handle the censoring, one assumes along with the assumptions of a parametric model that the log of the time until death is conditional on the covariates, i.e. we have a normal distribution with a constant variance of sigma squared.\\
 
-Using the R {rms} package I create the survival time object which is a 2-column variable. It has the years of follow up or years until death, and the second column is binary indicator of what type of follow up that was, follow up while still alive, or at death.\\
+Using the R {rms} package you create the survival time object S which is a 2-column variable. It has the years of follow up or years until death, and the second column is binary indicator of what type of follow up that was, follow up while still alive, or at death.\\
 
-Next I made stratified Kaplan-Meier Estimates, transforming the y-axis using the inverse normal transformation/or Z transformation. The plots' linearities and approximate-parallelisms demonstrate a reasonable fit for the log-normal accelerated failure time model using one predictor.\\
+Next you make stratified Kaplan-Meier Estimates, transforming the y-axis using the inverse normal transformation/or Z transformation. The plots' linearities and approximate-parallelisms demonstrate a reasonable fit for the log-normal accelerated failure time model using one predictor.\\
 
-Then I fit a parametric survival model of type log normal accelerated failure time model, using disease group as a predictor, a restricted cubic spline for age with 5 knots, and the same for blood pressure with 5 knots.\\
+Then you fit a parametric survival model of type log normal accelerated failure time model, using disease group as a predictor, a restricted cubic spline for age with 5 knots, and the same for blood pressure with 5 knots.\\
 
 In mathematics, a spline generally refers to a continuous curve constructed so as to pass through a given set of points and have a certain number of continuous derivatives.\\
 
-There are 3 very powerful variables in this tentative model, and by the time one has 3 powerful variables the residuals should behave similarly to the way they will in a final model.\\
+There are 3 very powerful variables in this tentative model, and by the time you have 3 powerful variables the residuals should behave similarly to the way they will in a final model.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
 1. Creating distribution summaries for predictor variables using the datadist() function {rms}.\\
-2. 
-3.
-4. 
-5.
-6. 
-
+2. Describing the distributions of variables to {rms}.\\
+3. Converting the days of follow up (d.time) variable to years.\\
+4. Creating the right-censored survival time object/variable using the Surv() function {survival}.\\
+5. # Displaying inverse Kaplan-Meier estimates stratified by disease group (dzgroup) using the survplot() function {rms}. Show normal inverse Kaplan-Meier estimates stratified by dzgroup.\\
 \end{tcolorbox}
 ```{r tentative_model_analysis}
 # 1
 dd <- datadist(ac)
 
-# Describing the distributions of variables to {rms}
+# 2
 options(datadist = 'dd')
 
-# Converting the days of follow up (d.time) variable to years:
+# 3
 years <- d.time / 365.25
 units(years) <- 'Year'
 
-# Creating the right-censored survival time object using the Surv() function
-# {survival}:
+# 4
 S <- Surv(years, death)
 
-# Displaying Kaplan-Meier estimates stratified by disease group (dzgroup) using
-# the survplot() function {rms}.
-# Show normal inverse Kaplan-Meier estimates stratified by dzgroup
+# 5
 survplot(npsurv(S ~ dzgroup),
          conf = 'none',
          fun = qnorm,
          logt = TRUE)
 ```
-
+# LEFT OFF HERE
 
 # Calculating the tentative model's residuals
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
