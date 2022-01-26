@@ -20,7 +20,7 @@ header-includes:
 - \usepackage[shortlabels]{enumitem}
 - \usepackage{dcolumn}
 ---
-# Test Text added for commit
+
 #Final Project, DA 5030 Data Mining & Machine Learning, Peter Jemley
 
 # Case Study Introduction: Prognostic Nomograms from Parametric Survival Modeling
