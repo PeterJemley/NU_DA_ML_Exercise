@@ -470,12 +470,14 @@ When doing so one can see that we have the R squared with which each variable ca
 No variables were found to be redundant to the level of having and R squared of 0.9 for predictability. 
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. redun () {Hmisc} uses flexible parametric additive models (along with areg()'s {Hmisc} use of regression splines) to determine how well each variable can be predicted from the remaining variables. Variables are dropped in a stepwise fashion, removing the most predictable variable at each step.
-1a. This type of analysis requires missing values to be imputed such as those imputed immediately above in order to preserve the information content of the sample (i.e. to not significantly reduce the sample size).
-1b. redun() also exceeds the abilities of the varclus() pairwise correlation approach, permitting nonmonotonic transformations for predicting each predictor from all other predictors.
+1. redun () {Hmisc} uses flexible parametric additive models (along with areg()'s {Hmisc} use of regression splines) to determine how well each variable can be predicted from the remaining variables. Variables are dropped in a stepwise fashion, removing the most predictable variable at each step.\\
+1a. This type of analysis requires missing values to be imputed such as those imputed immediately above in order to preserve the information content of the sample (i.e. to not significantly reduce the sample size).\\
+1b. redun() also exceeds the abilities of the varclus() pairwise correlation approach, permitting nonmonotonic transformations for predicting each predictor from all other predictors.\\
 \end{tcolorbox}
 ```{r redundancy_analysis}
 # 1
+# 1a
+# 1b
 redun(
   ~ crea + age + sex + dzgroup + num.co + scoma + adlsc +
     race2 + meanbp + hrt + resp + temp + sod + wblc.i +
@@ -483,7 +485,7 @@ redun(
   nk = 4
 )
 ```
-# LO
+
 # Avoiding Bias: Fit the PSM and conduct an ANOVA
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Bias is a type of systemic or systematic error. A satisfaction questionnaire that leads patients to never report that they are dissatisfied with their medical care is an example of bias. It typically pertains to the discrepency between the average of many estimates over repeated sampling and the true value of a parameter. Therefore bias is more related to frequentist statistics than to Bayesian statistics.
@@ -500,12 +502,17 @@ There are 3 knots for some variables which are not so strong, temp is forced to 
 
 I may have thrown away the wrong terms of temperature because what little it has to say might be coming from the nonlinear terms and those are the ones we’re discarding. But that's one way to remain unbiased on the average.
 \end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. Creating a constant to represent 4 knots for the psm() function {rms}.\\
+2. Using rcs() {rms} helps to blind researchers from becoming aware of the linear forms of continuous variables' effect, removing a source of bias.\\
+2a rcs() is one of a series of functions (asis, pol, lsp, rcs, catg, scored, strat, matrx, gTrans, and %ia%) that set up special attributes (such as knots and nonlinear term indicators) that are carried through to fits (using for example lrm,cph, ols, psm). anova.rms, summary.rms, Predict, survplot, fastbw, validate, specs, which.influence, nomogram and latex.rms use these attributes to automate certain analyses (e.g., automatic tests of linearity for each predictor are done by anova.rms). Many of the functions are called implicitly.\\
+3. Plot the ANOVA — the plot blinds analysts from seeing the forms of coefficients' effects, e.g. linearity test results.
+\end{tcolorbox}
 ```{r fit_psm_max_4}
-# Creating a constant to represent 4 knots for the psm() function {rms}:
+# 1
 k <- 4
 
-# Using "rcs" {rms} helps to blind researchers from becoming aware of the 
-# linear forms of continuous variables' effect, removing a source of bias:
+# 2
 f <- psm(
   S ~ rcs(age, k) + sex + dzgroup + pol(num.co, 2) + scoma +
     pol(adlsc, 2) + race + rcs(meanbp, k) + rcs(hrt, k) +
@@ -514,8 +521,7 @@ f <- psm(
   dist = 'lognormal'
 )
 
-# Plot the ANOVA — the plot blinds analysts from seeing the forms of 
-# coefficients' effects, i.e. linearity test result:
+# 3
 plot(anova(f)) 
 ```
 
@@ -537,7 +543,11 @@ The Somer’s Dxy rank correlation between the predicted and log survival time i
 
 The discrimination index g sub r demonstrates the typical survival time ratio of two patients chosen at random — how different can you say they are on the basis of their covariates. The log normal survival model, instead of creating hazard ratios, creates survival time ratios, which are most cleanly thought of as ratios of predicted median survival times.\\
 \end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. Here you can fit another log-normal survival model whose number of parameters (which correspond with the nonlinear effects of the previous model immediately above) you can determined from the ANOVA plot also immediately above. You can allocated five knots for the predictors which appear in the ANOVA which support these analysis best. You can use five knots beacuse fewer singularity problems exist once you remove the predictors which contribute far less to the goal of the analysis.
+\end{tcolorbox}
 ```{r fit_second_psm_model}
+# 1
 f_2 <- psm(
   S ~ rcs(age, 5) + sex + dzgroup + num.co +
     scoma + pol(adlsc, 2) + race2 + rcs(meanbp, 5) +
@@ -580,7 +590,13 @@ Disease group has a chi squired with 2 df of 45 so it’s a very powerful variab
 
 Whereas the race and sex variables are not very relevant.\\
 \end{tcolorbox}
-```{r model_summary}
+\begin{tcolorbox}[width=\textwidth]
+1. Predict() {rms} computes predicted values and confidence limits. It allows the user to easily specify which predictors are to vary. Predicted values are the linear predictor (X beta), a user-specified transformation of that scale, or estimated probability of surviving past a fixed single time point given the linear predictor. Predict is usually used for plotting predicted values.
+\end{tcolorbox}
+1a. This includes a ggplot method for Predict() objects which makes it easy to visualize predicted values and their confidence bands.
+```{r model_summary, fig.height = 4, fig.width = 4}
+# 1
+# 1a
 ggplot(
   Predict(f_2, ref.zero = TRUE),
   vnames = 'names',
@@ -605,7 +621,7 @@ print(a, size = 'tsz')
 
 # Plotting the ANOVA
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-Plotting the ANOVA is where we see that disease group is the biggest predictor. This is similar to before when the model was saturated and I assumed more degrees of freedom for some of the variables.
+Plotting the ANOVA is where we see that disease group is the biggest predictor. This is similar to before when the model was saturated and you could assume more degrees of freedom for some of the variables.
 
 This provides us with a brief look/snapshot of the variables involved in predicting time until death. They represent proxy features which biology has itself engineered with which we can indirectly observe important underlying processes in acutely ill patients. 
 \end{tcolorbox}
@@ -621,8 +637,15 @@ It gives output with blue bars with point estimates shown with a triangle in the
 
 The biggest effect is shown in the difference between having acute respiratory failure with multiple organ system failure with sepsis compared to being septic and in a coma. Being septic and in a coma is worse, with survival cut by almost a factor of 10, so the ratio is a little bigger than 0.1.\\
 \end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. options() {base} allows users to set and examine a variety of global options which affect the way in which R computes and displays its results.
+2. summary () {base} is a generic function used to produce result summaries of the results of various model fitting functions. The function invokes particular methods which depend on the class of the first argument.
+\end{tcolorbox}
 ```{r summary_plot}
+# 1
 options(digits = 3)
+
+# 2
 plot(summary(f_2), log = TRUE, main = '')
 ```
 
@@ -655,13 +678,19 @@ The slope shrinks from 1.00 to .9 which represents an estimated regression to th
 
 So, overall validate() indicates a moderate amount of overfitting but the shrinkage factor of .9 is acceptable. The result is an unbiased estimate of the future predictive discrimination on equivalent patients is the corrected Dxy index of .43.
 \end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. Adding data to the fitted model to allow the bootstrap to re-sample.\\
+2. For reproducibility.\\
+3. The validate() function {rms}, when used on an object created by one of the rms series functions, does resampling of the validation of a regression model, with or without backward step-down variable deletion.
+\end{tcolorbox}
 ```{r validate_indexes}
-# Adding data to the fitted model to allow the bootstrap to re-sample:
+# 1
 g <- update(f_2, x = TRUE, y = TRUE)
 
-#   # For reproducibility
+# 2
 set.seed(717)
 
+# 3
 suppressWarnings({
   print(rms::validate(
     g,
@@ -689,12 +718,11 @@ To prevent this you use the bootstrap validation of the calibration curve which 
 
 Here the dots represent the accuracy of the calibration accuracy. X's are estimates from the bootstrapwith their overﬁtting corrected. The corrected overfittings were the result of predicted survival probabilities being binned as described immmediately above, along with their Kaplan-Meier estimates. The black curve is the relationship of patients' conditions to their predicted survival estimates using calibrate()'s "hare" method, and the blue curve is the overfitted estimate of the same. The gray line is the "ideal" statistical relationship.\\
 \end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. calibrate() {rms} uses bootstrapping or here to get bias-corrected, or overfitting corrected, estimates of predicted vs. observed values based on subsetting predictions into intervals (for survival models) or on nonparametric smoothers (for other models).
+\end{tcolorbox}
 ```{r}
-# calibrate() {rms} uses bootstrapping or here to get bias-corrected, or 
-# overfitting corrected, estimates of predicted vs. observed values based on
-# subsetting predictions into intervals (for survival models) or on
-# nonparametric smoothers (for other models).
-
+# 1
 suppressWarnings({
   set.seed(717)
   cal <- calibrate(g, u = 1, B = 400)
@@ -711,8 +739,7 @@ suppressWarnings({
 })
 ```
 
-
-# Approximating the Full Model
+# Simplifying the Full Model
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 For some use cases parsimony is an important factor. Because it attenuates the quality of predicted discrimination it's a good idea to avoid it. And in the modern computer age we predictions based on electronic medical record systems don’t need to be parsimonious If you’re trying to use something in the field, however, where you’re trying to save time and money collecting data, there can be good use cases for parsimonious models.\\
 
@@ -728,13 +755,19 @@ I'll stop at the point which the variables at the top that are dropped are dispe
 
 This method would also have to be reproducible, but that’s beyond the scope of this case study.\\
 \end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. predict() {stats} is a generic function for predictions from the results of various model fitting functions.\\
+$$ X*\hat{\beta} $$ 
+2. ols() {rms} is a linear model estimation using ordinary least squares. It fits the usual weighted or unweighted linear regression model using the same fitting routines used by lm, but also storing the variance-covariance matrix var and using traditional dummy-variable coding for categorical factors.\\
+2a. Here you use sigma = 1 to prevent sigma hat from being zero when R2 = 1, which is the case here because you begin by approximating Z with all the variables from the full model.\\
+3. fastbw() {rms} performs a numerically stable version of fast backward elimination on factors. It uses a fitted complete model and computes approximate Wald statistics by computing conditional (restricted) maximum likelihood estimates assuming multivariate normality of estimates.
+\end{tcolorbox}
 ```{r}
-# X*beta hat
+# 1
 Z <- predict(f_2)    
 
-# Here you use sigma = 1 to prevent sigma hat from being zerowhen R2 = 1,
-# which is the case here because I began by approximating Z with all 
-# the variables from the full model:
+
+# 2
 a <- ols(
   Z ~ rcs(age, 5) + sex + dzgroup + num.co +
     scoma + pol(adlsc, 2) + race2 +
@@ -744,10 +777,7 @@ a <- ols(
   sigma = 1
 )
 
-# fastbw() {rms} performs a numerically stable version of fast backward 
-# elimination on factors. It uses a fitted complete model and 
-# computes approximate Wald statistics by computing conditional (restricted) 
-# maximum likelihood estimates assuming multivariate normality of estimates.
+# 3
 fastbw(a, aics = 10000)  
 ```
 
@@ -772,7 +802,12 @@ This model is .957 accurate. This is the simplest form of the predictions and in
 
 This model is also the basis for the nomogram, which is coming up. 
 \end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. ols() {rms} is a linear model estimation using ordinary least squares. It fits the usual weighted or unweighted linear regression model using the same fitting routines used by lm, but also storing the variance-covariance matrix var and using traditional dummy-variable coding for categorical factors.
+2. Printing the new model's statistics.
+\end{tcolorbox}
 ```{r}
+# 1
 f.approx <- ols(
   Z ~ dzgroup + rcs(meanbp, 5) + rcs(crea, 4) +
     rcs(age, 5) + rcs(hrt, 3) + scoma +
@@ -781,40 +816,50 @@ f.approx <- ols(
   x = TRUE
 )
 
+# 2
 f.approx$stats
 ```
 
 # Mapping the full model's coefficients onto the approximate model coefficients
+\begin{tcolorbox}[width=\textwidth]
+1. This returns the variance-covariance matrix of the main parameters of a fitted model object — in this case the full model, f_2.\\
+2. This creates the design of the full model.\\
+3. This creates the design of the simplified approxmiate model.\\
+4. This creates a contrast matrix for the full and approximate models.\\
+5. This formula maps the full model's coefficients onto the approximate model coefficients.\\
+\end{tcolorbox}
+
+
 ```{r}
-# This returns the variance-covariance matrix of the main parameters of a
-# fitted model object — in this case the full model, f_2. 
-# var(full model)
+# 1
 V <- vcov(f_2, regcoef.only = TRUE)
 
-# This creates the design of the full model:
+# 2
 X <- cbind(Intercept = 1, g$x)
 
-# This creates the design of the approxmiate model:
+# 3
 x <- cbind(Intercept = 1, f.approx$x)
 
-# This creates a contrast matrix for the full and approximate models:
+# 4
 w <- solve(t(x) %*% x, t(x)) %*% X
 
-# This formula maps the full model's coefficients onto the approximate 
-# model coefficients.
+# 5
 v <- w %*% V %*% t(w)
 ```
 
 
 # Approximate model's estimated variances
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
+Here you compare the variance estimates — the diagonals of v — with variance estimates from the reduced model ﬁtted against the actual outcomes.\\
 The approximate model's estimated variances are somewhat slightly smaller than those that you would have gotten from stepwise variable selection employing a stopping rule to select the same set of variables.
 \end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. Fit the reduced model against the actual outcomes.\\
+2. Comparing the variance estimates (the diagonals of v) with variance estimates from the simplified model fitted against the actual outcomes.\\
+3. diag() {base} extracts or replaces the diagonal of a matrix, or construct a diagonal matrix. Here it constructs a diagonal matrix.
+\end{tcolorbox}
 ```{r}
-# Here you compare the variance estimates — the diagonals of v created 
-# immediately above — with variance estimates from the reduced model ﬁtted
-# against the actual outcomes.
-
+# 1
 f.sub <- psm(
   S ~ dzgroup + rcs(meanbp, 5) + rcs(crea, 4) +
     rcs(age, 5) + rcs(hrt, 3) + scoma + rcs(pafi.i, 4) +
@@ -822,18 +867,20 @@ f.sub <- psm(
   dist = 'lognormal'
 )
 
-# Estimated variances
+# 2
 diag(v) / diag(vcov(f.sub , regcoef.only = TRUE))
 
-# diag() {base} extract or replace the diagonal of a matrix, or construct 
-# a diagonal matrix. Here it constructs a diagonal matrix
+# 3
 r <- diag(v) / diag(vcov(f.sub, regcoef.only = TRUE))
 r[c(which.min(r), which.max(r))]
 ```
 
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-The Wald statistics for the reduced model. 
+The Wald statistics for the reduced model.\\
+
+IN the results you can note the similarity between these statistics and those from the same Wald statistics table for the full model. Had been very collinear with the kept/retained variables these similarities would not be the case.
 \end{tcolorbox}
+#LO
 ```{r}
 f.approx$var <- v
 print(anova(f.approx, test = 'Chisq', ss = FALSE), size = 'tsz')
