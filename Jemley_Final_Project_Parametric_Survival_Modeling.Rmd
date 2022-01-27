@@ -181,8 +181,7 @@ death, sex, death in hospital (hospdead), days study entry to discharge (slos), 
 3. For mean arterial blood pressure, a numeric variable.\\
 4. For heart rate, a numeric variable. As plotted, heart rate appears to have outliers. These rates are not unusual for patients with supraventricular #tachycardia, however.\\
 5. For respiration rate, day 3, a numeric variable. Tachypnea, rapid breathing, is also not unusual in acutely-ill patients. The patient with the rate which is the outlier died.\\
-6. For temperature (celcius), day 3, a numeric variable. The one outlier was 
-# also associated with patient who died.\\
+6. For temperature (celcius), day 3, a numeric variable. The one outlier was also associated with patient who died.\\
 7. # For pafi, a measure of oxygenation of tissues, a numeric variable. The greatest outlier is over the reference range (5 - 800), but this value should remain as it may in fact be an accurate measurement.\\
 8. For serum albumin (alb), a numeric variable. All of these values are within the reference range for acutely-ill patients.\\
 9. For bilirubin day 3 (bili), a numeric variable. Although these outliers are extreme, they are noted in the medical literature for acutely-ill patients.\\
@@ -250,9 +249,9 @@ To handle the censoring, one assumes along with the assumptions of a parametric 
 
 Using the R {rms} package you create the survival time object S which is a 2-column variable. It has the years of follow up or years until death, and the second column is binary indicator of what type of follow up that was, follow up while still alive, or at death.\\
 
-Next you make stratified Kaplan-Meier Estimates, transforming the y-axis using the inverse normal transformation/or Z transformation. The plots' linearities and approximate-parallelisms demonstrate a reasonable fit for the log-normal accelerated failure time model using one predictor.\\
+Next you make stratified Kaplan-Meier Estimates, transforming the y-axis using the inverse normal transformation, or Z transformation. If you only had disease group (dzgroup) in the model with these 3 categories, which you don’t here (but we’re oversimplifying), then the log normal model would fit if these lines were all straight and parallel. They all look pretty straight but they don’t look perfectly parallel, indicating that the sigma in the model (the residual standard deviation on the log scale) may need to vary and we don’t really have a systematic way to approach that. The plots' linearities and approximate parallelisms demonstrate a reasonable fit for the log-normal accelerated failure time model using one predictor.\\
 
-Then you fit a parametric survival model of type log normal accelerated failure time model, using disease group as a predictor, a restricted cubic spline for age with 5 knots, and the same for blood pressure with 5 knots.\\
+You can hope that when you adjust for more variables you adjust for more heterogeneity of the patients — and that variables will be fitting the log normal model better. So, then you fit a parametric survival model of type log normal accelerated failure time model, using disease group as a predictor, a restricted cubic spline for age with 5 knots, and the same for blood pressure with 5 knots.\\
 
 In mathematics, a spline generally refers to a continuous curve constructed so as to pass through a given set of points and have a certain number of continuous derivatives.\\
 
@@ -285,7 +284,6 @@ survplot(npsurv(S ~ dzgroup),
          fun = qnorm,
          logt = TRUE)
 ```
-# LEFT OFF HERE
 
 # Calculating the tentative model's residuals
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
@@ -293,15 +291,15 @@ Moving on to calculating the tentative model's residuals, when there is censored
 
 To look at the distribution of the residuals we can take censoring into account using the Kaplan-Meier estimate just as we would with raw data.\\
 
-To help with this I generate a random number which can serve as a touchstone for the tentative model. When stratifying by a random number the sampling variation will still be there but it will be pure sampling variation because a random number is unrelated to anything in the dataset — stratifying by a random number should generate identical distributions as those in the data.\\
+To help with this you generate a random number which can serve as a touchstone for the tentative model. When stratifying by a random number the sampling variation will still be there but it will be pure sampling variation because a random number is unrelated to anything in the dataset — stratifying by a random number should generate identical distributions as those in the data.\\
 
 So, a random number has to fit the data and the residuals have to have the same distribution. That random number is stratifying the Kaplan-Meier estimates by the random number into quartiles, so for continuous variables this surplus function on the residuals breaks it into quartiles by default.  And we see some variation with the random data that’s really not different from the variation you get on the real stratifications.\\
 
-When I stratify by disease group there's a little bit of a shoulder there early on which is slightly problematic. Stratifying by age is a very good fit: all of those 4 curves by quartiles of age are hovering around the thick black curve which is the theoretical 1 minus normal cumulative distribution function that should hold if our model assumptions are true.\\
+When you stratify by disease group there's a little bit of a shoulder there early on which is slightly problematic. Stratifying by age is a very good fit: all of those 4 curves by quartiles of age are hovering around the thick black curve which is the theoretical 1 minus normal cumulative distribution function that should hold if your model's assumptions are sound\\
 
 When stratifying by mean arterial blood pressure the curve is off a little bit from the theoretical curve but about the same as when stratifying by the random number.\\
 
-Like all graphical assessments of model fit this is a subjective process but this model fit is as good as one usually sees.\\
+Like all graphical assessments of model fit this is a subjective process but this model fit is as good as you usually sees.\\
 \end{tcolorbox}
 ```{r tentative_psm_model_residuals}
 # Creating a parametric survival model object using the psm() function {rms}.
@@ -327,6 +325,7 @@ label(random) <- 'Random Number'
 survplot(r, random, label.curve = FALSE)
 ```
 
+# LEFT OFF HERE
 # Building the accelerated failure time parametric survival time model 
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Next I began building the accelerated failure time parametric survival model. A big part of building this model is getting the subject matter input about which of the variables should be used as predictors and another big part is how to assign degrees of freedom to those variables. \\
