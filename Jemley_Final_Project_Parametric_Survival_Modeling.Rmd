@@ -262,7 +262,7 @@ There are 3 very powerful variables in this tentative model, and by the time you
 2. Describing the distributions of variables to {rms}.\\
 3. Converting the days of follow up (d.time) variable to years.\\
 4. Creating the right-censored survival time object/variable using the Surv() function {survival}.\\
-5. # Displaying inverse Kaplan-Meier estimates stratified by disease group (dzgroup) using the survplot() function {rms}. Show normal inverse Kaplan-Meier estimates stratified by dzgroup.\\
+5. # Displaying inverse Kaplan-Meier estimates stratified by disease group (dzgroup) using the survplot() function {rms}. Show normal inverse Kaplan-Meier estimates stratified by dzgroup. npsurv() {rms} computes an estimate of a survival curve for censored data using either the Kaplan-Meier or the Fleming-Harrington method or computes the predicted survivor function.\\
 \end{tcolorbox}
 ```{r tentative_model_analysis}
 # 1
@@ -301,66 +301,73 @@ When stratifying by mean arterial blood pressure the curve is off a little bit f
 
 Like all graphical assessments of model fit this is a subjective process but this model fit is as good as you usually sees.\\
 \end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. Creating a parametric survival model object using the psm() function {rms}. psm() psm fits the accelerated failure time family of parametric survival models, and uses the rms class for automatic anova, fastbw, calibrate, validate, and other functions.The object S is created as a function of the disease group, a restricted cubic spline for age with 5 knots, and the same for mean arterial blood pressure with 5 knots.\\
+2. Extracting the model's residuals using the residuals() function {stats}.\\
+3. Plotting the curves of the residuals.\\
+4. Creating the random variables and plotting them.
+\end{tcolorbox}
 ```{r tentative_psm_model_residuals}
-# Creating a parametric survival model object using the psm() function {rms}.
-# The object S is created as a function of the disease group, a restricted cubic
-# spline for age with 5 knots, and the same for mean arterial blood pressure 
-# with 5 knots.
-
+# 1
 f <- psm(S ~ dzgroup + rcs(age, 5) + rcs(meanbp, 5),
          dist = 'lognormal',
          y = TRUE)
 
-# Extracting the model's residuals using the residuals() function {stats}:
+# 2
 r <- resid(f)
 
-# Plotting the curves of the residuals: 
+# 3
 survplot(r, dzgroup, label.curve = FALSE)
 survplot(r, age,     label.curve = FALSE)
 survplot(r, meanbp,  label.curve = FALSE)
 
-# Creating the random variables and plotting them:
+# 4
 random <- runif(length(age))
 label(random) <- 'Random Number'
 survplot(r, random, label.curve = FALSE)
 ```
 
-# LEFT OFF HERE
 # Building the accelerated failure time parametric survival time model 
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-Next I began building the accelerated failure time parametric survival model. A big part of building this model is getting the subject matter input about which of the variables should be used as predictors and another big part is how to assign degrees of freedom to those variables. \\
+Next you begin by building the accelerated failure time parametric survival model. A big part of building this model is getting the subject matter input about which of the variables should be used as predictors and another big part is how to assign degrees of freedom to those variables. \\
 
 In general, degrees of freedom refers to the number of “free floating” parameters, or the number of opportunities a statistical estimator or method was given.\\
 
-I examined which variables had enough predictive potential to justify giving them many of degrees of freedom, i.e. variables which were very steep in their relationship to survival time. You have to try to avoid under-modeling such variables by assuming they're linear when they may not be.\\
+You examine which variables had enough predictive potential to justify giving them many of degrees of freedom, i.e. variables which were very steep in their relationship to survival time. You have to try to avoid under-modeling such variables by assuming they're linear when they may not be.\\
 
-I began by using the pairwise Spearman rho squared method: the generalized one that uses the rank of the predictor and the square of the rank of the predictor against the rank of survival time.\\
+You canb begin by using the pairwise Spearman rho squared method: the generalized one that uses the rank of the predictor and the square of the rank of the predictor against the rank of survival time.\\
 
-Spearman’s rho squared doesn’t know anything about censoring so you can’t give it the time until event variable because its censored values would be considered the same as the uncensored values, which is a clear error.\\
+Spearman’s rho squared doesn’t know anything about censoring so you can’t give it the time until event variable because its censored values would be considered the same as the uncensored values. That's an obvious error.\\
 
-From the data I found that the shortest follow up time for survivors is a year, so I was able to truncate the data at one year and just look at the action between zero and 365 days. That is the period for which there is complete data, and for any patient followed for 365 days we know that they were either alive at day 365 or we know the date of their death within that interval.\\
+From the data you find that the shortest follow up time for survivors is a year, so you can truncate the data at one year and just look at the action between zero and 365 days. That is the period for which there is complete data, and for any patient followed for 365 days we know that they were either alive at day 365 or we know the date of their death within that interval.\\
 
-This provides complete data, but data with a substantially lower information content because we’re not distinguishing between a death in the truncated data and any death between 366 days and 1000 days.\\
+This provides complete data, but data with a substantially lower information content because you're not distinguishing between a death in the truncated data and any death between 366 days and 1000 days.\\
 
 When the follow up times are truncated at the shortest follow up, one year, the Spearman’s rho squared is calculated — the 2 degrees of freedom generalization of it.\\
 
 The variable that has the highest potential is the coma score (scoma), which is a simple translation of the Glasgow Coma Score, and the next highest potential variable is mean blood pressure, and the third is disease group.\\
 
-The coma score is a bit different because it was derived from an overall analysis of the SUPPORT patients, and although derived from a Cox model it was linear. So I had to end up giving one degree of freedom to that even though that knowledge was gained from an analysis other than this one.\\
+The coma score is a bit different because it was derived from an overall analysis of the SUPPORT patients, and although derived from a Cox model it was linear. So you'll have to end up giving one degree of freedom to that even though that knowledge was gained from an analysis other than this one.\\
 
-The mean blood pressure is continuous so we want to give it the max number of knots of later, and for disease group we want to leave in its three categories and not collapse any of those. For the variables with lower potential prediction value they will have only one degree of freedom, forcing them to be linear.\\
+The mean blood pressure is continuous so you want to give it the max number of knots of later, and for disease group we want to leave in its three categories and not collapse any of those. For the variables with lower potential prediction value they will have only one degree of freedom, forcing them to be linear.\\
 
-This type of analysis, as well as the next one we’re going to do, is looking at predictors one variable at a time, not each adjusted for the other, making this analysis somewhat unreliable.
+This type of analysis, as well as the next one we’re going to do, is looking at predictors one variable at a time, not each adjusted for the other, making this particular part of this case study basically unreliable.
+\end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. Calculating the shortest follow up.\\
+2. Converting shortest_follow_up to an object for the spearman2() function as a regular minima object with pmin() {base}.\\
+3. Creating the bivariate Spearman’s rho squared object with 2 degrees of freedom.\\
+4. # Plot it.
 \end{tcolorbox}
 ```{r first_tentative_psm_analysis}
-# Calculating the shortest follow up:
+# 1
 shortest.follow.up <- min(d.time[death == 0], na.rm = TRUE)
 
 # Converting shortest_follow_up to an object for the spearman2() function
 # a parallel minima object:
 d.timet <- pmin(d.time, shortest.follow.up)
 
-# Creating the bivariate Spearman’s rho squared object with 2 degrees of freedom:
+# 3
 w <- spearman2(
   d.timet ~ age + num.co + scoma + meanbp +
     hrt + resp + temp + crea + sod + adlsc +
@@ -369,44 +376,54 @@ w <- spearman2(
 )
 
 
-# Plot it:
+# 4
 plot(w, main = '')
 ```
 
-
 # A better approach to take censoring into account
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-I was able to use a different rank correlation coefficient, namely Somer’s Dxy, which has been adapted to handle right censoring. When calculating concordant and discordant numbers that go into all possible pairs analysis with Somer’s D we can take partial information into account.\\
+You can use a different rank correlation coefficient, namely Somer’s Dxy, which has been adapted to handle right censoring. When calculating concordant and discordant numbers that go into all possible pairs analysis with Somer’s D we can take partial information into account.\\
 
-For example, if someone died before someone else was censored we know that the censored person has already outlived the other person and we know how the ranking between them works in that sense. But the analysis includes two persons who were censored and we cannot compare them, so when calculating concordant pairs that will be one uncertain pair.\\
+For example, if someone died before someone else was censored we know that the censored person has already outlived the other person and we know how the ranking between them works in that sense. But the analysis includes two persons who were censored and we cannot compare them, so when calculating concordant pairs there will be one uncertain pair.\\
 
-So, I'm taking into account censoring and looking at the variables one at a time using Somer’s Dxy instead of using a Spearman correlation.  Although Somer’s Dxy is not able to detect nonmonotonic relationships (variables which do not generally vary in the same way or direction), when we use this approach, using the rcorrcens() function in the {Hmisc} package this makes it easy to take the censoring discussed immediately above into account.\\
+So, you're taking into account censoring and looking at the variables one at a time using Somer’s Dxy instead of using a Spearman correlation.  Although Somer’s Dxy is not able to detect nonmonotonic relationships (variables which do not generally vary in the same manner or direction), when you use this approach, using the rcorrcens() function in the {Hmisc} package this makes it easy to take the censoring discussed immediately above into account.\\
 
-This results in the graph in which we can see that mean blood pressure has the highest prediction potential, creatinine next, then disease group, then coma score: they’re all very high.\\
+This results in the graph in which you can see that mean blood pressure has the highest prediction potential, creatinine next, then disease group, then coma score: they’re all very high.\\
 
-We can have more confidence in this graph than the previous one which used the oversimplified Spearman’s rho squared.\\
+You can have more confidence in this graph than the previous one which used the oversimplified Spearman’s rho squared.\\
+\end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. Taking censoring into account using the rcorrcens() function {Hmisc}. rcorrcens() {Hmisc} computes the c index and the corresponding generalization of Somers' Dxy rank correlation for a censored response variable.\\
+2. Plot it.
 \end{tcolorbox}
 ```{r second_tentative_psm_analysis}
-# Taking censoring into account using the rcorrcens() function {Hmisc}:
+# 1
 w <- rcorrcens(
   S ~ age + num.co + scoma + meanbp + hrt + resp +
     temp + crea + sod + adlsc + wblc + pafi + ph +
     dzgroup + race
 )
 
+# 2
 plot(w, main = '') 
 ```
 
 # Simple Imputation
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-Here is code for simple imputation based on sound statistical principles.\\
+Here is code for simple imputation based on sound statistical principles and meaningful research.\\
 
-For example, if white blood count data is missing I entered 9 (which in the original scale was 9000). For this type of imputation there was a federal grant from what is now called AHRQ to study the safest ways to impute data in an ICU population like this.\\
+For example, if white blood count data is missing I entered 9 (which in the original scale was 9000). For this type of imputation there was a federal grant from what is now called AHRQ to study the safest ways to impute data in an ICU population like the population in the SUPPORT Study.\\
 
 The research found that the physicians were very good at knowing that for certain patients ordering certain tests were unnecessary because they would consistently come back normal. The research found that instead of doing an overly complex imputation it actually worked better to put in the most normal value for these variables as constants. 
 \end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. Determining the number of missing values per variable.\\
+2. Imputation.\\
+3. Collapse race into race2 as race turned out not to be relevant in this dataset.\\
+4. datadist() determines summaries of variables for effect and plotting ranges, values to adjust to, and overall ranges for the functions Predict, plot.Predict, ggplot.Predict, summary.rms, survplot, and nomogram.rms.
+\end{tcolorbox}
 ```{r simple_imputation}
-# Determining the number of missing values per variable:
+# 1
 sapply(llist(
   age,
   num.co,
@@ -424,19 +441,17 @@ sapply(llist(
 ), function(x)
   sum(is.na(x)))
 
-# Imputation:
+# 2
 wblc.i <- impute(wblc, 9)
 pafi.i <- impute(pafi, 333.3)
 ph.i   <- impute(ph, 7.4)
 race2  <- race
 
-# Collapse race into race2 as race turned out not to be relevant in this dataset:
+# 3
 levels(race2) <- list(white = 'white', other = levels(race)[-1])
 race2[is.na(race2)] <- 'white'
 
-# datadist() determines summaries of variables for effect and plotting ranges,
-# values to adjust to, and overall ranges for the functions Predict, plot.Predict,
-# ggplot.Predict, summary.rms, survplot, and nomogram.rms.
+# 4
 dd <- datadist(dd, wblc.i, pafi.i, ph.i, race2)
 ```
 
@@ -454,7 +469,13 @@ When doing so one can see that we have the R squared with which each variable ca
 
 No variables were found to be redundant to the level of having and R squared of 0.9 for predictability. 
 \end{tcolorbox}
+\begin{tcolorbox}[width=\textwidth]
+1. redun () {Hmisc} uses flexible parametric additive models (along with areg()'s {Hmisc} use of regression splines) to determine how well each variable can be predicted from the remaining variables. Variables are dropped in a stepwise fashion, removing the most predictable variable at each step.
+1a. This type of analysis requires missing values to be imputed such as those imputed immediately above in order to preserve the information content of the sample (i.e. to not significantly reduce the sample size).
+1b. redun() also exceeds the abilities of the varclus() pairwise correlation approach, permitting nonmonotonic transformations for predicting each predictor from all other predictors.
+\end{tcolorbox}
 ```{r redundancy_analysis}
+# 1
 redun(
   ~ crea + age + sex + dzgroup + num.co + scoma + adlsc +
     race2 + meanbp + hrt + resp + temp + sod + wblc.i +
@@ -462,7 +483,7 @@ redun(
   nk = 4
 )
 ```
-
+# LO
 # Avoiding Bias: Fit the PSM and conduct an ANOVA
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Bias is a type of systemic or systematic error. A satisfaction questionnaire that leads patients to never report that they are dissatisfied with their medical care is an example of bias. It typically pertains to the discrepency between the average of many estimates over repeated sampling and the true value of a parameter. Therefore bias is more related to frequentist statistics than to Bayesian statistics.
