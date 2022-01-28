@@ -133,25 +133,28 @@ plot(naclus(support[acute, ]))
 
 # Detecting statistical associations between variables
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-Here I conducted a variable clustering in addition to the one above, to see which variables' values may be similar to one another.\\
+Here you conduct a variable clustering, in addition to the one above, to see which variables' values may be similar to one another.\\
 
-This clustering uses a very general measure: Hoeffding’s D, a completely general measure of independence. It’s ideal for continuous variables but works somewhat for discrete ones when they are ordered.\\
+This clustering uses Hoeffding’s D, a general measure of independence. It’s ideal for continuous variables but works somewhat for discrete ones when they are ordered.\\
 
-The measure's range is a little hard to understand — but it’s so general it can detect relationships between variables having a high dependencies.\\
+varclus() implements a hierarchical cluster analysis on variables, using the Hoeffding D statistic, squared Pearson or Spearman correlations, or proportion of observations for which two variables are both positive as similarity measures. Variable clustering is used for assessing collinearity, redundancy, and for separating variables into clusters that can be scored as a single variable, thus resulting in data reduction.\\
+
+The measure's range is a little hard to understand — but it’s so general it can detect relationships between variables having high dependencies.\\
 
 So we can see that the two variables whose values are the most similar to each other are serum creatinine and serum bun — both measures of renal function.\\
 
 This is the closest case in this dataset in which two variables could be considered redundant.
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. I create a new data subset for the modeling.\\
+1. You create a new data subset for the modeling.\\
 
-2. I then drop the unused levels from support's designated acute illness groups.\\
-3. Appying the label Disease Group to the subset.\\
+2. You then drop the unused levels from support's designated acute illness groups.\\
 
-4. Then I attach the new subset to R's search path before implementing the varclus() function. varclus() {Hmisc} implements a hierarchical cluster analysis on variables, using the Hoeffding D statistic, squared Pearson or Spearman correlations, or proportion of observations for which two variables are both positive as similarity measures. Variable clustering is used for assessing collinearity, redundancy, and for separating variables into clusters that can be scored as a single variable, thus resulting in data reduction.\\
+3. Applying the label Disease Group to the subset.\\
 
-5. Then I plot the similarity matrix created by varclus() as a hierarchical cluster.
+4. Then you attach the new subset to R's search path before implementing the varclus() function.\\
+
+5. Then you plot the similarity matrix created by varclus() as a hierarchical cluster.
 \end{tcolorbox}
 ```{r detect_statistical_associations}
 # 1
@@ -179,7 +182,9 @@ plot(vc)
 
 # Verifying variables' reference ranges
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-After creating a new data subset for modeling I created boxplots for each variable when apposite, with explanations for what clearly appear to be outliers in the data.\\
+After creating a new data subset for modeling you can create boxplots for each variable when apposite, with explanations for what clearly appear to be outliers in the data.\\
+
+Code to print boxplots is commented out below to save on printing space but they were examined before proceeding.\
 
 All conclusions about these outliers accompany the code for each boxplot, as well as explanations for those variables unsuitable to plotting. Running the describe() function on the data above, the SUPPORT Study's own abstractors' efforts, along with verifying the reference ranges shown in the boxplots for the numeric variables below, demonstrate that no outliers are present in this subset of the SUPPORT Study's data.\\
 
@@ -187,7 +192,6 @@ Each of the following are unsuitable to boxplot()s:\\
 death, sex, death in hospital (hospdead), days study entry to discharge (slos), days of follow-up (d.time), disease group (dzgroup), disease class (dzclass), number of co-morbidities (num.co), income, SUPPORT coma score (scoma), hospital charges (charges), total micro-cost (totmcst), race, white blood cell count (wblc), all of the activities of daily living (adlp, adls, adlsc), and sfdm (severe functional disability). Their values and ranges were verified using the describe() function.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-(Code to print boxplots is commented out to save printing space.)
 1. For age, a numeric variable.\\
 
 2. For average TISS (avtisst, the Therapeutic Intervention Scoring System, which is a method for calculating costs in the intensive care unit (ICU) and intermediate care unit (IMCU) of a hospital), a numeric variable.\\
@@ -267,34 +271,36 @@ death, sex, death in hospital (hospdead), days study entry to discharge (slos), 
 
 # Choosing a Tentative Model
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-Here I make a tentative model choice of a log normal accelerated failure time model. This model choice would be ordinary linear regression if the study did not involve any censoring. There is censoring here because patients who were not followed up on until their deaths were censored at their last contact date.\\
+Here you can make a tentative model choice of a log normal accelerated failure time model. This model choice would be ordinary linear regression if the study did not involve any censoring. There is censoring here because patients who were not followed up on until their deaths were censored at their last contact date.\\
 
 When the response variable is the time until an event, subjects not followed long enough for the event to have occurred have their event times censored at the time of last follow-up.\\
 
 To handle the censoring, one assumes along with the assumptions of a parametric model that the log of the time until death is conditional on the covariates, i.e. we have a normal distribution with a constant variance of sigma squared.\\
 
-Using the R {rms} package you create the survival time object S which is a 2-column variable. It has the years of follow up or years until death, and the second column is binary indicator of what type of follow up that was, follow up while still alive, or at death.\\
+Using the rms package you create the survival time object S which is a 2-column variable. It has the years of follow up or years until death, and the second column is binary indicator of what type of follow up that was, i.e. follow up while still alive, or at death.\\
 
-Next you make stratified Kaplan-Meier Estimates, transforming the y-axis using the inverse normal transformation, or Z transformation. If you only had disease group (dzgroup) in the model with these 3 categories, which you don’t here (but we’re oversimplifying), then the log normal model would fit if these lines were all straight and parallel. They all look pretty straight but they don’t look perfectly parallel, indicating that the sigma in the model (the residual standard deviation on the log scale) may need to vary and we don’t really have a systematic way to approach that. The plots' linearities and approximate parallelisms demonstrate a reasonable fit for the log-normal accelerated failure time model using one predictor.\\
+Next you make stratified Kaplan-Meier Estimates, transforming the y-axis using the inverse normal transformation, or Z transformation. If you only had disease group (dzgroup) in the model with these 3 categories, which you don’t here but we’re oversimplifying, then the log normal model would fit if these lines were all straight and parallel.\\
 
-You can hope that when you adjust for more variables you adjust for more heterogeneity of the patients — and that variables will be fitting the log normal model better. So, then you fit a parametric survival model of type log normal accelerated failure time model, using disease group as a predictor, a restricted cubic spline for age with 5 knots, and the same for blood pressure with 5 knots.\\
+They all look pretty straight but they don’t look perfectly parallel, indicating that the sigma in the model (the residual standard deviation on the log scale) may need to vary and we don’t really have a systematic way to approach that. The plots' linearities and approximate parallelisms, however,  demonstrate a reasonable fit for the log-normal accelerated failure time model using one predictor.\\
+
+You can hope that when you adjust for more variables you adjust for more heterogeneity among the patients — and that variables will be fitting the log normal model better. So, then you fit a parametric survival model of type log normal accelerated failure time model, using disease group as a predictor, a restricted cubic spline for age with 5 knots, and the same for blood pressure with 5 knots.\\
 
 In mathematics, a spline generally refers to a continuous curve constructed so as to pass through a given set of points and have a certain number of continuous derivatives.\\
 
 There are 3 very powerful variables in this tentative model, and by the time you have 3 powerful variables the residuals should behave similarly to the way they will in a final model.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. Creating distribution summaries for predictor variables using the datadist() function {rms}.\\
+1. Creating distribution summaries for predictor variables using the datadist() function. \\
 
-2. Describing the distributions of variables to {rms}.\\
+2. Describing the distributions of variables to rms.\\
 
 3. Converting the days of follow up (d.time) variable to years.\\
 
-4. Creating the right-censored survival time object/variable using the Surv() function {survival}.\\
+4. Creating the right-censored survival time object/variable using the Surv() function from the survival package.\\
 
-5. Displaying inverse Kaplan-Meier estimates stratified by disease group (dzgroup) using the survplot() function {rms}. Show normal inverse Kaplan-Meier estimates stratified by dzgroup. npsurv() {rms} computes an estimate of a survival curve for censored data using either the Kaplan-Meier or the Fleming-Harrington method or computes the predicted survivor function.
+5. Displaying inverse Kaplan-Meier estimates stratified by disease group (dzgroup) using the survplot() function from rms. Show normal inverse Kaplan-Meier estimates stratified by dzgroup. npsurv() from rms computes an estimate of a survival curve for censored data using either the Kaplan-Meier or the Fleming-Harrington method or computes the predicted survivor function.
 \end{tcolorbox}
-```{r tentative_model_analysis}
+```{r tentative_model_analysis, fig.height=4, fig.width=7}
 # 1
 dd <- datadist(ac)
 
@@ -329,18 +335,18 @@ When you stratify by disease group there's a little bit of a shoulder there earl
 
 When stratifying by mean arterial blood pressure the curve is off a little bit from the theoretical curve but about the same as when stratifying by the random number.\\
 
-Like all graphical assessments of model fit this is a subjective process but this model fit is as good as you usually sees.\\
+Like all graphical assessments of model fit this is a subjective process but this model fit is as good as you usually see.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. Creating a parametric survival model object using the psm() function {rms}. psm() psm fits the accelerated failure time family of parametric survival models, and uses the rms class for automatic anova, fastbw, calibrate, validate, and other functions.The object S is created as a function of the disease group, a restricted cubic spline for age with 5 knots, and the same for mean arterial blood pressure with 5 knots.\\
+1. Creating a parametric survival model object using the psm() function from rms. psm()  fits the accelerated failure time family of parametric survival models, and uses the rms class for automatic anova, fastbw, calibrate, validate, and other functions. The object S is created as a function of the disease group, a restricted cubic spline for age with 5 knots, and the same for mean arterial blood pressure with 5 knots.\\
 
-2. Extracting the model's residuals using the residuals() function {stats}.\\
+2. Extracting the model's residuals using the residuals() function from the base stats package.\\
 
 3. Plotting the curves of the residuals.\\
 
 4. Creating the random variables and plotting them.
 \end{tcolorbox}
-```{r tentative_psm_model_residuals}
+```{r tentative_psm_model_residuals, fig.height=4, fig.width=7}
 # 1
 f <- psm(S ~ dzgroup + rcs(age, 5) + rcs(meanbp, 5),
          dist = 'lognormal',
@@ -366,36 +372,36 @@ Next you begin by building the accelerated failure time parametric survival mode
 
 In general, degrees of freedom refers to the number of “free floating” parameters, or the number of opportunities a statistical estimator or method was given.\\
 
-You examine which variables had enough predictive potential to justify giving them many of degrees of freedom, i.e. variables which were very steep in their relationship to survival time. You have to try to avoid under-modeling such variables by assuming they're linear when they may not be.\\
+You examine which variables had enough predictive potential to justify giving them many degrees of freedom, i.e. variables which were very steep in their relationship to survival time. You have to try to avoid under-modeling such variables by assuming they're linear when they may not be.\\
 
-You canb begin by using the pairwise Spearman rho squared method: the generalized one that uses the rank of the predictor and the square of the rank of the predictor against the rank of survival time.\\
+You can begin by using the pairwise Spearman rho squared method: the generalized one that uses the rank of the predictor and the square of the rank of the predictor against the rank of survival time.\\
 
 Spearman’s rho squared doesn’t know anything about censoring so you can’t give it the time until event variable because its censored values would be considered the same as the uncensored values. That's an obvious error.\\
 
-From the data you find that the shortest follow up time for survivors is a year, so you can truncate the data at one year and just look at the action between zero and 365 days. That is the period for which there is complete data, and for any patient followed for 365 days we know that they were either alive at day 365 or we know the date of their death within that interval.\\
+From the data you find that the shortest follow up time for survivors is a year, so you can truncate the data at one year and just look at the actions between zero and 365 days. That is the period for which there is complete data, and for any patient followed for 365 days we know that they were either alive at day 365 or we know the date of their death within that interval.\\
 
-This provides complete data, but data with a substantially lower information content because you're not distinguishing between a death in the truncated data and any death between 366 days and 1000 days.\\
+This provides complete data, but data with a substantially lower information content because you're not distinguishing between a death in the truncated data and any death between 366 days and 1000 days, for example.\\
 
-When the follow up times are truncated at the shortest follow up, one year, the Spearman’s rho squared is calculated — the 2 degrees of freedom generalization of it.\\
+When the follow up times are truncated at the shortest follow up, one year, the Spearman’s rho squared is calculated — i.e. the 2 degrees of freedom generalization of it.\\
 
-The variable that has the highest potential is the coma score (scoma), which is a simple translation of the Glasgow Coma Score, and the next highest potential variable is mean blood pressure, and the third is disease group.\\
+The variable that has the highest potential is the coma score (scoma), which is a simple translation of the Glasgow Coma Score, and the next highest potential variable is mean arterial blood pressure, and the third is disease group.\\
 
 The coma score is a bit different because it was derived from an overall analysis of the SUPPORT patients, and although derived from a Cox model it was linear. So you'll have to end up giving one degree of freedom to that even though that knowledge was gained from an analysis other than this one.\\
 
-The mean blood pressure is continuous so you want to give it the max number of knots of later, and for disease group we want to leave in its three categories and not collapse any of those. For the variables with lower potential prediction value they will have only one degree of freedom, forcing them to be linear.\\
+The mean blood pressure is continuous so you want to give it the max number of knots, and for disease group we want to leave in its three categories and not collapse any of those. For the variables with lower potential prediction value they will have only one degree of freedom, forcing them to be linear.\\
 
-This type of analysis, as well as the next one we’re going to do, is looking at predictors one variable at a time, not each adjusted for the other, making this particular part of this case study basically unreliable.
+This type of analysis, as well as the next one you’re going to do, consists of looking at predictors one variable at a time, not each adjusted for the other, making this particular part of this case study basically somewhat unreliable, but that will be improved on as we move on. 
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
 1. Calculating the shortest follow up.\\
 
-2. Converting shortest follow up object to an object for the spearman2() function as a regular minima object with pmin() {base}.\\
+2. Converting shortest follow up object to an object for the spearman2() function as a parallel minima object with pmin() from the base package.\\
 
 3. Creating the bivariate Spearman’s rho squared object with 2 degrees of freedom.\\
 
 4. Plot it.
 \end{tcolorbox}
-```{r first_tentative_psm_analysis}
+```{r first_tentative_psm_analysis, fig.height=6, fig.width=7}
 # 1
 shortest.follow.up <- min(d.time[death == 0], na.rm = TRUE)
 
@@ -417,18 +423,18 @@ plot(w, main = '')
 
 # A better approach to take censoring into account
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-You can use a different rank correlation coefficient, namely Somer’s Dxy, which has been adapted to handle right censoring. When calculating concordant and discordant numbers that go into all possible pairs analysis with Somer’s D we can take partial information into account.\\
+You can use a different rank correlation coefficient, Somer’s Dxy, which has been adapted to handle right censoring. When calculating concordant and discordant numbers that go into all possible pairs analysis with Somer’s D we can take partial information into account.\\
 
 For example, if someone died before someone else was censored we know that the censored person has already outlived the other person and we know how the ranking between them works in that sense. But the analysis includes two persons who were censored and we cannot compare them, so when calculating concordant pairs there will be one uncertain pair.\\
 
-So, you're taking into account censoring and looking at the variables one at a time using Somer’s Dxy instead of using a Spearman correlation.  Although Somer’s Dxy is not able to detect nonmonotonic relationships (variables which do not generally vary in the same manner or direction), when you use this approach, using the rcorrcens() function in the {Hmisc} package this makes it easy to take the censoring discussed immediately above into account.\\
+So, you're taking into account censoring and looking at the variables one at a time using Somer’s Dxy instead of using a Spearman correlation.  Although Somer’s Dxy is not able to detect nonmonotonic relationships (variables which do not generally vary in the same manner or direction), when you use this approach, using the rcorrcens() function in the Hmisc package this makes it easy to take the censoring discussed immediately above into account.\\
 
 This results in the graph in which you can see that mean blood pressure has the highest prediction potential, creatinine next, then disease group, then coma score: they’re all very high.\\
 
 You can have more confidence in this graph than the previous one which used the oversimplified Spearman’s rho squared.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. Taking censoring into account using the rcorrcens() function {Hmisc}. rcorrcens() {Hmisc} computes the c index and the corresponding generalization of Somers' Dxy rank correlation for a censored response variable.\\
+1. Taking censoring into account using the rcorrcens() function from the Hmisc package. rcorrcens() computes the c index and the corresponding generalization of Somers' Dxy rank correlation for a censored response variable.\\
 
 2. Plot it.
 \end{tcolorbox}
@@ -448,7 +454,7 @@ plot(w, main = '')
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Here is code for simple imputation based on sound statistical principles and meaningful research.\\
 
-For example, if white blood count data is missing I entered 9 (which in the original scale was 9000). For this type of imputation there was a federal grant from what is now called AHRQ to study the safest ways to impute data in an ICU population like the population in the SUPPORT Study.\\
+For example, if white blood count data is missing you enter 9 (which in the original scale was 9000). For this type of imputation there was a federal grant from what is now called AHRQ to study the safest ways to impute data in an ICU population like the population in the SUPPORT Study.\\
 
 The research found that the physicians were very good at knowing that for certain patients ordering certain tests were unnecessary because they would consistently come back normal. The research found that instead of doing an overly complex imputation it actually worked better to put in the most normal value for these variables as constants. 
 \end{tcolorbox}
@@ -457,7 +463,7 @@ The research found that the physicians were very good at knowing that for certai
 
 2. Imputation.\\
 
-3. Collapse race into race2 as race turned out not to be relevant in this dataset.\\
+3. Collapse race into race2 as race turned out not to have explanatory power for this analysis due to the patients’ acute conditions — although racism is a very important factor for social determinants of health in other medical contexts.\\
 
 4. datadist() determines summaries of variables for effect and plotting ranges, values to adjust to, and overall ranges for the functions Predict, plot.Predict, ggplot.Predict, summary.rms, survplot, and nomogram.rms.
 \end{tcolorbox}
@@ -498,18 +504,16 @@ dd <- datadist(dd, wblc.i, pafi.i, ph.i, race2)
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 After data imputation the data is ready for a formal multivariable redundancy analysis. This takes each of the potential predictor variables and attempts to predict each from the others.\\
 
-The redun() function {Hmisc} goes improves on the varclus pairwise correlation analysis by allowing for nonmonotonic transformations while predicting each predictor from all the others.\\
+The redun() function from the Hmisc package improves on the varclus pairwise correlation analysis by allowing for nonmonotonic transformations while predicting each predictor from all the others.\\
 
 redun() uses 4 knots here — knots represent the points at which the coeﬃcients in an equation change.\\
 
-Here I also collapsed one variable with little predictive value for this context, race, and collapsed it into a new variable, race2.\\
-
-When doing so one can see that we have the R squared with which each variable can be predicted from the others. So, the variable which is the most predictable from the others, going across, is disease group with a score of 0.45, and scoma at 0.42. Those two are somewhat predictable from each other because the coma group from disease group is going to have a very poor scoma score due to the coma patients inherent disease characteristics.\\
+When doing so you can see that we have the R squared with which each variable can be predicted from the others. So, the variable which is the most predictable from the others, going across, is disease group with a score of 0.45, and scoma at 0.42. Those two are somewhat predictable from each other because the coma group from disease group is going to have a very poor scoma score due to the coma patients inherent disease characteristics.\\
 
 No variables were found to be redundant to the level of having and R squared of 0.9 for predictability. 
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. redun () {Hmisc} uses flexible parametric additive models (along with areg()'s {Hmisc} use of regression splines) to determine how well each variable can be predicted from the remaining variables. Variables are dropped in a stepwise fashion, removing the most predictable variable at each step.\\
+1. redun () uses flexible parametric additive models (along with areg()'s use of regression splines, also from the Hmisc package) to determine how well each variable can be predicted from the remaining variables. Variables are dropped in a stepwise fashion, removing the most predictable variable at each step.\\
 
 1a. This type of analysis requires missing values to be imputed such as those imputed immediately above in order to preserve the information content of the sample (i.e. to not significantly reduce the sample size).\\
 
@@ -529,26 +533,26 @@ redun(
 
 # Avoiding Bias: Fit the PSM and conduct an ANOVA
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-Bias is a type of systemic or systematic error. A satisfaction questionnaire that leads patients to never report that they are dissatisfied with their medical care is an example of bias. It typically pertains to the discrepency between the average of many estimates over repeated sampling and the true value of a parameter. Therefore bias is more related to frequentist statistics than to Bayesian statistics.
+Bias is a type of systemic or systematic error. A satisfaction questionnaire that leads patients to never report that they are dissatisfied with their medical care is an example of bias. It typically pertains to the discrepancy between the average of many estimates over repeated sampling and the true value of a parameter. Bias of this general type is on the surface more related to frequentist statistics than to Bayesian statistics.\\
 
 I spent a lot of time looking at the complexity of the model and allocating degrees of freedom, but in this data context where we have enough events to look at in a model which is saturated. It's considered sound practice to take the saturated model approach in allocating degrees of freedom.\\
 
-When looking at the ANOVA in the plot you do see that the variable which had the least to say was the sex variable, and the variable which has the most to say is the disease group. Once I adjusted for everything else the variable which is seeming to have the most extra information is disease group, which is followed by creatinine, then mean bp, then age, then lung function, then coma score. So, I was able to trust this analysis more because it’s not just looking at marginal univariate or pairwise associations.\\
+When looking at the ANOVA in the plot you do see that the variable which had the least to say was the sex variable, and the variable which has the most to say is the disease group. Once you’ve adjusted for everything else the variable which is seeming to have the most extra information is disease group, which is followed by creatinine, then mean bp, then age, then lung function, then coma score. So, you can trust this analysis more than the one above because it’s not just looking at marginal univariate or pairwise associations.\\
 
-Adjusting or controlling for a variable refers to assessing the effect of one variable while accounting for the effect of another (confounding) variable. When an apparent association between two outcomes might be explained by some observed common factor that influences both, this common cause is known as a confounder. Adjustment for the other variable can be carried out by stratifying the analysis (especially if the variable is categorical) or by statistically estimating the relationship between the variable and the outcome and then subtracting out that effect to study which effects remain.\\
+Adjusting or controlling for a variable refers to assessing the effect of one variable while accounting for the effect of another (confounding) variable. When an apparent association between two outcomes might be explained by some observed common factor that influences both, this common cause is known as a confounder. Adjustment for the other variable can be carried out by stratifying the analysis (especially if the variable is categorical) or when continuous by statistically estimating the relationship between the variable and the outcome and then subtracting out that effect to study which effects remain.\\
 
-I proceeded to fit the model on the basis of the latter method (statistically estimating the relationship between the variable and the outcome and then subtracting out that effect), according to the most promising predictors which were allocated 5 knots and then allocating in descending order as they appear on the dot chart.\\
+I proceeded to fit the model on the basis of the latter method (statistically estimating the relationship between the variable and the outcome and then subtracting out that effect), according to the most promising predictors which were allocated 5 knots and then allocated in descending order as they appear on the dot chart.\\
 
 There are 3 knots for some variables which are not so strong, temp is forced to be linear because it didn’t have much potential at all even when allowed to be nonlinear.\\
 
-I may have thrown away the wrong terms of temperature because what little it has to say might be coming from the nonlinear terms and those are the ones we’re discarding. But that's one way to remain unbiased on the average.
+You may have thrown away the wrong terms of temperature because what little it has to say might be coming from the nonlinear terms and those are the ones we’re discarding. But that's one way to remain unbiased on the average.
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. Creating a constant to represent 4 knots for the psm() function {rms}.\\
+1. Create a constant to represent 4 knots for the psm() function from the rms package.\\
 
-2. Using rcs() {rms} helps to blind researchers from becoming aware of the linear forms of continuous variables' effect, removing a source of bias.\\
+2. Using the rcs() function from the rsm package helps to blind researchers from becoming aware of the linear forms of continuous variables' effects, removing a source of bias.\\
 
-2a rcs() is one of a series of functions (asis, pol, lsp, rcs, catg, scored, strat, matrx, gTrans, and %ia%) that set up special attributes (such as knots and nonlinear term indicators) that are carried through to fits (using for example lrm,cph, ols, psm). anova.rms, summary.rms, Predict, survplot, fastbw, validate, specs, which.influence, nomogram and latex.rms use these attributes to automate certain analyses (e.g., automatic tests of linearity for each predictor are done by anova.rms). Many of the functions are called implicitly.\\
+2a rcs() is one of a series of functions (asis, pol, lsp, rcs, catg, scored, strat, matrx, gTrans, and %ia%) that set up special attributes (such as knots and nonlinear term indicators) that are carried through to fits (using for example lrm,cph, ols, psm).  anova.rms, summary.rms, Predict, survplot, fastbw, validate, specs, which.influence, nomogram and latex.rms use these attributes to automate certain analyses (e.g., automatic tests of linearity for each predictor are done by anova.rms). Many of the functions are called implicitly.\\
 
 3. Plot the ANOVA — the plot blinds analysts from seeing the forms of coefficients' effects, e.g. linearity test results.
 \end{tcolorbox}
@@ -571,7 +575,7 @@ plot(anova(f))
 
 # From the output from the model we see:
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-There were 537 observations, we didn’t have any observation discarded due to missing data.\\
+There were 537 observations, we didn’t have any observations discarded due to missing data.\\
 
 We had 356 deaths (events).\\
 
@@ -579,9 +583,9 @@ The standard deviation (sigma) of log survival time was estimated to be 2.23.\\
 
 The model had a Likelihood Ratio Chi squared of 237 on 30 parameters (i.e, 30 degrees of freedom).\\
 
-So, there's strong evidence that variables in the model are directly associated with survival time.\\
+So, there's strong evidence that variables in the model are directly associated with patients’ survival windows.\\
 
-There is also a pseudo R squared of .594, which is a very strong R squared when you’re trying to predict the exact date on which someone is going to die — unusual for prognostic models. The ICU population is very special in this regard because all of their body system functions were measured very carefully nearly each day.\\
+There is also a pseudo R squared of .594, which is a very strong R squared when you’re trying to predict the exact date on which someone is going to die — this is unusual for prognostic models. The ICU population is very special in this regard because all of their body system functions were measured very carefully nearly each day.\\
 
 The Somer’s Dxy rank correlation between the predicted and log survival time is also very high at .485.\\
 
@@ -590,7 +594,7 @@ The discrimination index g sub r demonstrates the typical survival time ratio of
 \begin{tcolorbox}[width=\textwidth]
 1. Here you can fit another log-normal survival model whose number of parameters (which correspond with the nonlinear effects of the previous model immediately above) you can determined from the ANOVA plot also immediately above.\\
 
-1a. You can allocated five knots for the predictors which appear in the ANOVA which support these analysis best. You can use five knots beacuse fewer singularity problems exist once you remove the predictors which contribute far less to the goal of the analysis.
+1a. You can allocate five knots for the predictors which appear in the ANOVA which support this analysis best. You can use five knots because fewer singularity problems exist once you remove the predictors which contribute far less to the goal of the analysis.
 \end{tcolorbox}
 ```{r fit_second_psm_model}
 # 1
@@ -617,13 +621,13 @@ The effects are plotted on the log survival scale.\\
 
 All effects are centered so that they can be compared on a common scale.\\
 
-And I conducted a Wald chi squared statistics penalized for degrees of freedom.\\
+This includes a Wald chi squared analysis penalized for degrees of freedom.\\
 
 The panels made with ggplot show us the partial effects of each predictor, which are especially clean because we don’t have interactions in this model.\\
 
 Activities of daily living score is not very powerful as a predictor, chi squared with 2 df is 8.3, somewhat nonlinear.\\
 
-Age effect is fairly linear and a stronger variable. The confidence intervals go to zero at the reference value for age, the median age. I’ve centered these using an arbitrary reference to give an effect of zero which is the median (or mode for categorical variables) of the variable. Confidence intervals have to shrink when you’re defining the median to be the comparison group.\\
+Age effect is fairly linear and a stronger variable. The confidence intervals go to zero at the reference value for age, the median age. You can center these using an arbitrary reference to give an effect of zero which is the median (or mode for categorical variables) of the variable. Confidence intervals have to shrink when you’re defining the median to be the comparison group.\\
 
 Creatinine effect is extremely nonlinear and very powerful.\\
 
@@ -638,7 +642,7 @@ Disease group has a chi squired with 2 df of 45 so it’s a very powerful variab
 Whereas the race and sex variables are not very relevant.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. Predict() {rms} computes predicted values and confidence limits. It allows the user to easily specify which predictors are to vary. Predicted values are the linear predictor (X beta), a user-specified transformation of that scale, or estimated probability of surviving past a fixed single time point given the linear predictor. Predict is usually used for plotting predicted values.\\
+1. Predict() from the rms package computes predicted values and confidence limits. It allows the user to easily specify which predictors are to vary. Predicted values are the linear predictor (X beta), a user-specified transformation of that scale, or estimated probability of surviving past a fixed single time point given the linear predictor. Predict() is also usually used for plotting predicted values.\\
 
 1a. This includes a ggplot method for Predict() objects which makes it easy to visualize predicted values and their confidence bands.
 \end{tcolorbox}
@@ -701,39 +705,40 @@ plot(summary(f_2), log = TRUE, main = '')
 
 # Internal Validation of the Fitted Model Using the Bootstrap
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-The bootstrap is a simulation technique for studying properties of statistics without the need to have the infinite population available. The most common use of the bootstrap involves taking random samples (with replacement) from the original dataset and studying how some quantity of interest varies.\\
+The bootstrap is a simulation technique for studying properties of statistics without the need to have a theoretical infinite population available. The most common use of the bootstrap involves taking random samples (with replacement) from the original dataset and studying how some quantity of interest varies.\\
 
-I validated the model internally, which is a very rigorous process with a lot of advantages over external validation.\\
+You can validate the model internally, which is a very rigorous process with a lot of advantages over external validation.\\
 
-You can internally validate as soon as the model is finished if you’ve programmed all the steps used to obtain the model, and they can be included in the bootstrap.\\
+You can internally validate as soon as the model is finished if you’ve programmed all the steps used to obtain the model, then they can be included in the bootstrap.\\
 
-This is a resampling based internal validation which validates all of the steps used to build the model. This process estimates the performance of the procedures we used to build the model. This is, coincidentally, also an estimate of the likely future performance of the model in its final form. External validation is useful when you don’t trust the person validating the model to do so without bias. External validation also validates a model’s measurement systems and a few other factors.\\
+This is a resampling based internal validation which validates all of the steps used to build the model. This process estimates the performance of the procedures you used to build the model. This is, coincidentally, also an estimate of the likely future performance of the model in its final form. External validation is useful when you don’t trust the person validating the model to do so without bias. External validation also validates a model’s measurement systems and a few other factors.\\
 
-Here we'll use the bootstrap to update the model fit to include the design matrix with all of the cubed terms along with all the indicator variables in the model.\\
+Here you can use the bootstrap to update the model fit to include the design matrix with all of the cubed terms along with all the indicator variables in the model.\\
 
 This includes the log survival times and the fit object "g".\\
 
-I set a random number seed for reproducibility, then repeat the for the recommended 400 iterations.\\
+You can set a random number seed for reproducibility, then repeat for the recommended 400 iterations.\\
 
 For each iteration the algorithm also computes the Somer’s Dxy measure.\\
 
 The validation results are as follows:\\
-Somer’s Dxy was .49. When sampling with replacement with the bootstrap sample and refitting the model and duplicating some observations.\\
 
-This will cause some overfit so the Somer's Dxy increases to .51. When the model is complete and applied to test data the optimism factor is eliminated and it goes back down to .46.
+Somer’s Dxy was .49. When sampling with replacement with the bootstrap sample and refitting the model some observations will be duplicated.\\
+
+This will cause some overfit so the Somer's Dxy increases to .51. When the model is complete and applied to test data the optimism factor is eliminated and it goes back down to .46.\\
 
 The bootstrap assumes that the difference between .51 and .46 (.46 representing usual overfitting, and .51 representing super overfitting), equals the difference between .49 and what you would like to know to subtract from .49 to give us the index that’s corrected for all overfitting. validate() estimates that index to be 43 so, 43 represents the likely future performance for patients from the same stream as the types of patients modeled here.\\
 
 The slope shrinks from 1.00 to .9 which represents an estimated regression to the mean of about 10%. This indicates that approximately 10% of everything we learned was noise.\\
 
-So, overall validate() indicates a moderate amount of overfitting but the shrinkage factor of .9 is acceptable. The result is an unbiased estimate of the future predictive discrimination on equivalent patients is the corrected Dxy index of .43.
+So, overall validate() indicates a moderate amount of overfitting but the shrinkage factor of .9 is acceptable. The result is an unbiased estimate of the future predictive discrimination on equivalent patients as the corrected Dxy index of .43.
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
 1. Adding data to the fitted model to allow the bootstrap to re-sample.\\
 
 2. For reproducibility.\\
 
-3. The validate() function {rms}, when used on an object created by one of the rms series functions, does resampling of the validation of a regression model, with or without backward step-down variable deletion.
+3. The validate() function, when used on an object created by one of the rms series functions, does resampling of the validation of a regression model, with or without backward step-down variable deletion.
 \end{tcolorbox}
 ```{r validate_indexes}
 # 1
@@ -758,7 +763,7 @@ suppressWarnings({
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 The next step is to validate the absolute predictive accuracy of the model on the survival probability scale.\\ 
 
-Bootstrapping does this by taking into account all the sources of uncertainty, and focuses on validating one predictiononly: the one year survival probability.\\
+Bootstrapping does this by taking into account all the sources of uncertainty, and focuses on validating one prediction only: the one year survival probability.\\
 
 Calibration refers to the reliability of predicted values, i.e., the extent to which predicted values agree with observed values. For a predictive model such as this one, a calibration curve is constructed by relating predicted to observed values in some smooth manner. The calibration curve is judged against a 45-degree line. Miscalibration is also referred to as bias. Calibration error is frequently assessed for predicted event probabilities.\\
 
@@ -766,12 +771,12 @@ There are 2 ways to validate the calibration curve. The old way is stratifying t
 
 But that would bias ("bend") the data, which is always asking for trouble. Stratification involves "binning" of continuous variables which substantially reduces the amount of information in them.\\
 
-To prevent this you use the bootstrap validation of the calibration curve which is the default in the calibrate() function {rms} for survival models. This method is more precise because it effectively uses interpolation across levels of predicted values, unlike the binning/categorization which stratification uses, and which creates the noisy line with a lot or variability.\\
+To prevent this you use the bootstrap validation of the calibration curve which is the default in the calibrate() function from the rms package for survival models. This method is more precise because it effectively uses interpolation across levels of predicted values, unlike the binning/categorization which stratification uses, and which creates the noisy line with a lot or variability.\\
 
-Here the dots represent the accuracy of the calibration. X's are estimates from the bootstrap with their overﬁtting corrected. The corrected overfittings were the result of predicted survival probabilities being binned as described immmediately above, along with their Kaplan-Meier estimates. The black curve is the relationship of patients' conditions to their predicted survival estimates using calibrate()'s "hare" method, and the blue curve is the overfitted estimate of the same. The gray line is the "ideal" statistical relationship.\\
+Here the dots represent the accuracy of the calibration. X's are estimates from the bootstrap with their overﬁtting corrected. The corrected overfittings were the result of predicted survival probabilities being binned as described immediately above, along with their Kaplan-Meier estimates. The black curve is the relationship of patients' conditions to their predicted survival estimates using calibrate()'s "hare" method, and the blue curve is the overfitted estimate of the same. The gray line is the "ideal" statistical relationship.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. calibrate() {rms} uses bootstrapping here to get bias-corrected, or overfitting corrected, estimates of predicted vs. observed values based on subsetting predictions into intervals (for survival models) or on nonparametric smoothers (for other models).
+1. calibrate() uses bootstrapping here to get bias-corrected, or overfitting corrected, estimates of predicted vs. observed values based on subsetting predictions into intervals (for survival models) or on nonparametric smoothers (for other models).
 \end{tcolorbox}
 ```{r}
 # 1
@@ -793,28 +798,28 @@ suppressWarnings({
 
 # Simplifying the Full Model
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-For some use cases parsimony is an important factor. Because it attenuates the quality of predicted discrimination it's a good idea to avoid it. And in the modern computer age we predictions based on electronic medical record systems don’t need to be parsimonious If you’re trying to use something in the field, however, where you’re trying to save time and money collecting data, there can be good use cases for parsimonious models.\\
+For some use cases parsimony is an important factor. Because it attenuates the quality of predicted discrimination it's a good idea to avoid it. And in the modern computer age you have predictions based on electronic medical record systems which don’t need to be parsimonious. If you’re trying to use something in the field, however, where you’re trying to save time and money collecting data, there can be good use cases for parsimonious models.\\
 
 If so and you want data to direct you in terms of which variables to discard and are not relying on outside and/or domain knowledge, the results have to be penalized. Bootstrapping will do that, and stepwise variable selection is generally relied on to develop a parsimonious model. It has a number of problems, however.\\
 
-Here there's an opportunity to take an alternative method by taking the full model as the gold standard. From there you can decide to use the full model for statistical tests, confidence intervals, etc. And equally important decision is to  can we approximate that model with high accuracy to produce a substitute predictive model?\\
+Here there's an opportunity to take an alternative method by taking the full model as the gold standard. From there you can decide to use the full model for statistical tests, confidence intervals, etc. An equally important decision is to ask whether you can approximate that model with high accuracy to produce a substitute predictive model?\\
 
 When you're able to approximate the predictions from the full model with a less complex model, along with being able to describe to users what they’re ceding when using a less complex model, this alternative approach can often be very helpful.\\
 
 You can obtain the predictions on the log survival time scale from the model which was just applied to the dataset. Then you can obtain a representation of those predictions from the complete set of original variables.\\
 
-I'll stop at the point which the variables at the top that are dropped are dispensable inasmuch as if we retained those top variables we could obtain predicted values that are accurately equivalent to our original gold standard predictions. This means ceasing the fast backward stepdown process before the R squared drops to 0.924.\\
+You can stop at the point which the variables at the top of the list that are dropped are dispensable inasmuch as if we retained those top variables we could obtain predicted values that are accurately equivalent to our original gold standard predictions. This means ceasing the fast backward stepdown process before the R squared drops to 0.924.\\
 
 This method would also have to be reproducible, but that’s beyond the scope of this case study.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. predict() {stats} is a generic function for predictions from the results of various model fitting functions.\\
+1. predict() from the stats package (with a lower case p) is a generic function for predictions from the results of various model fitting functions.\\
 $$ X*\hat{\beta} $$ 
-2. ols() {rms} is a linear model estimation using ordinary least squares. It fits the usual weighted or unweighted linear regression model using the same fitting routines used by lm, but also storing the variance-covariance matrix var and using traditional dummy-variable coding for categorical factors.\\
+2. ols() from the rms package is a linear model estimation using ordinary least squares. It fits the usual weighted or unweighted linear regression model using the same fitting routines used by lm() (the stats package function for fitting linear models), but also storing the variance-covariance matrix and using traditional dummy-variable coding for categorical factors.\\
 
 2a. Here you use sigma = 1 to prevent sigma hat from being zero when R2 = 1, which is the case here because you begin by approximating Z with all the variables from the full model.\\
 
-3. fastbw() {rms} performs a numerically stable version of fast backward elimination on factors. It uses a fitted complete model and computes approximate Wald statistics by computing conditional (restricted) maximum likelihood estimates assuming multivariate normality of estimates.
+3. fastbw() from the rms package performs a numerically stable version of fast backward elimination on factors. It uses a fitted complete model and computes approximate Wald statistics by computing conditional (restricted) maximum likelihood estimates assuming multivariate normality of estimates.
 \end{tcolorbox}
 ```{r}
 # 1
