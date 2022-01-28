@@ -28,48 +28,48 @@ header-includes:
 - \usepackage[shortlabels]{enumitem}
 - \usepackage{dcolumn}
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 # Introduction
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 For the final project I created a nomogram to graphically represent predicted mean and median survival time-windows modeled on biomedical and demographic data taken from the acutely-ill patients in the SUPPORT Study dataset archived in Vanderbilt University’s Department of Biostatistics. \\
 
-A nomogram is a graphical explanation of a prediction process. Nomograms are an easy-to-understand way to present and understand a prognosis. For medical providers making prognoses, and for patients receiving them, nomographic predictions make minimal demands in terms of pre-requisite statistical knowledge. A nomogram allows non-statistician patients and clinicians to both make and interpret a prognosis easily. \\
+A nomogram is a graphical explanation of a prediction process. Nomograms are an easy-to-understand way to present and understand a prognosis. For medical providers making prognoses, and for patients receiving them, nomographic predictions make minimal demands in terms of pre-requisite statistical knowledge.\\
 
-The benefits of such a diagram to my mind is that you can instantly see the relative effect of changes in the different predictor variables on the response variable. Even when the diagram isn't needed for any calculations it is able to directly display the relative effects of the variables in it.\\
+With such a diagram you can instantly see the relative effect of the different predictor variables (in the form of patients’ biomedical and relevant demographic data) on the potential outcome. Even when the diagram isn't needed for any of the simple arithmetic to tally a predictor score it is able to directly display the relative effects of patients’ conditions on their prognoses.\\
 
-The SUPPORT Study (Study to Understand Prognoses, Preferences, Outcomes, and Risks of Treatments) spanned five hospitals and includes data on the critical conditions of 10,000 adult patients, all of whom were studied both for their in-patient outcomes as well as their rates of surviving their critical conditions once discharged. 
+The SUPPORT Study (Study to Understand Prognoses, Preferences, Outcomes, and Risks of Treatments) spanned five hospitals and includes data on the critical conditions of 10,000 adult patients, all of whom were studied both for their in-patient outcomes as well as their rates of surviving their critical conditions once discharged.
 \end{tcolorbox}
 
 # The CRISP-DM Model
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-The CRISP-DM Model (Cross-Industry Standard Process for Data Mining) was the primary framework for this course's final project, and the process of producing a nomogram follows that model quite closely. Each of CRISP-DM's steps, as well as each of the data analysis and machine learning procedures which form this case study, are conducted sequentially here. CRISP-DM is a non-proprietary, documented, and freely available data mining model. Developed by industry leaders with input from more than 200 data mining users and data mining tool and service providers, CRISP-DM is an industry-, tool-, and application-neutral model. This model encourages best practices and offers organizations the structure needed to realize better, faster results from data mining. \\
+The CRISP-DM Model (Cross-Industry Standard Process for Data Mining) was the primary framework for this project. The process of producing a nomogram follows that model quite closely. Each of CRISP-DM's steps, as well as each of the data analysis and machine learning procedures which form this case study, are conducted sequentially here. CRISP-DM is a non-proprietary, documented, and freely available data mining model. Developed by industry leaders with input from more than 200 data mining users and data mining tool and service providers, CRISP-DM is an industry-, tool-, and application-neutral model. This model encourages best practices and offers organizations the structure needed to realize better, faster, reproducible results from data mining.\\
 
 CRISP-DM organizes the data mining process into six phases: business understanding, data understanding, data preparation, modeling, evaluation, and deployment. These phases help organizations understand the data mining process and provide a road map to follow while planning and carrying out a data mining project.
 \end{tcolorbox}
 
 # Nomograms and the CRISP-DM Model
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-It’s interesting to note a unique aspect of nomograms in terms of how they fit into the CRISP-DM Model. Predictive data analytics do not usually solve business problems on their own. They generally provide insights which help organizations make apposite decisions and apply them to those problems. The predictions made from nomograms do in fact solve some business problems in health care, namely effectively communicating complex biomedical contexts about patients with them and their families in an effective, reproducible, and low-cost manner. And in this project the business phase of the CRISP-DM Model — predicting survival times for acutely-ill patients modeled on the SUPPORT study — is also the deployment phase, the nomogram itself. \\
+It’s interesting to note a unique aspect of nomograms in terms of how they fit into the CRISP-DM Model. Predictive data analytics do not usually solve business problems on their own. They generally provide insights which help organizations make apposite decisions and apply them to those problems. The predictions made from nomograms do in fact solve some business problems in health care, namely effectively communicating complex biomedical contexts about patients with them and their families in an effective and low-cost manner. And in this project the business phase of the CRISP-DM Model — predicting survival times for acutely-ill patients modeled on the SUPPORT study — is also the deployment phase, the nomogram itself. \\
 
-For this case study I take a random sample of 1000 patients from the SUPPORT Study with which to conduct the parametric survival modeling described in detail below. I chose parametric survival modeling's methods primarily because D.R. Cox, the winner of the equivalent of the Nobel Prize for statistics in 2017, and the inventor of the widely used Cox Proportional Hazards Model, was asked after his award if he would do  anything differently if he could start his career again? He responded that he would have used parametric survival models more frequently. \\
+For this case study I took a random sample of 1000 patients from the SUPPORT Study with which to conduct the parametric survival modeling described in detail below. I chose parametric survival modeling's methods primarily because D.R. Cox, the winner of the equivalent of the Nobel Prize for statistics in 2017, and the inventor of the widely used Cox Proportional Hazards Model, was asked after his award if he would do  anything differently if he could start his career again. He responded that he would have used parametric survival models more frequently. \\
 
-His reasoning was that parametric survival modeling is more reliable, it is easier to get predicted values from parametric models, and the assumptions of the modeling are more transparent. And as is the case with the patients in this case study, when we approach time-dependent covariates it’s easier to handle and interpret them with parametric modeling rather than with a semi-parametric Cox model.
+His reasoning consisted of parametric survival modeling’s abilities to reliably derive predicted values from patient data according to modeling assumptions which are more transparent than other approaches. And as is the case here, parametric modeling’s approaches to patients’ time-dependent covariates can analyze and interpret them with greater accuracy and reliability than with a semi-parametric Cox model.
 \end{tcolorbox}
 
 # Accelerated Failure Time Models
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 The model I'm using is in the class of models referred to as accelerated failure time models because the prognostic modeling for acute patients doesn’t fit the patterns needed for a Cox Proportional Hazard Model. A Cox model tends to be more useful for modeling chronic diseases in which risk factors have more constant effects over time.\\
 
-In the study patients had to survive until Day 3 to qualify, and the baselines are the Day 3 measurements. We can see descriptive statistics in the output below. It's important to note that the age distribution goes all the way from 18 years to 95 years, and is a very nice distribution for this case study. The vast majority of subjects were in the ICU.\\
-
-{rms} contains a series of special transformation functions, fitting functions, and generic analysis functions which help automate many analysis steps, e.g. fitting restricted interactions and multiple stratification variables, analysis of variance (with tests of linearity of each factor and pooled tests), plotting effects of variables in the model, estimating and graphing effects of variables that appear non-linearly in the model using e.g. inter-quartile-range hazard ratios, bootstrapping model fits, and constructing nomograms for obtaining predictions manually.
+In the study patients had to survive until Day 3 to qualify for inclusion, and the baselines are the Day 3 measurements. You’ll see descriptive statistics for these measurements at the beginning of the analysis. It's important to note that the age distribution goes all the way from 18 years to 95 years, and is a very nice distribution for this case study. The vast majority of subjects were in the intensive care unit (ICU).
 \end{tcolorbox}
 
 # Libraries and the Computing Environment
 \begin{tcolorbox}[width=\textwidth]
-Scrub the environment, load libraries, and attach required special transformation functions from the {rms} package, then scrub the console.
+Here you scrub the environment, load libraries for visualizations, attach required special transformation and analytic functions from the apposite packages (rms and Hmisc), then scrub the console.\\
+
+rms, for example, contains a series of special transformation functions, fitting functions, and generic analysis functions which help automate many analysis steps, e.g. fitting restricted interactions and multiple stratification variables, analysis of variance (with tests of linearity of each factor and pooled tests), plotting effects of variables in the model, estimating and graphing effects of variables that appear non-linearly in the model using e.g. inter-quartile-range hazard ratios, bootstrapping model fits, and constructing nomograms for obtaining predictions manually.
 \end{tcolorbox}
 ```{r}
 library(ggplot2)
@@ -112,7 +112,7 @@ getHdata(support)
 acute <- support$dzclass %in% c('ARF/MOSF', 'Coma')
 
 # 3
-# describe(support[acute,])
+latex(describe(support[acute,]))
 ```
 
 # Hierarchical Cluster Analysis: Showing Patterns in any Missing Data
