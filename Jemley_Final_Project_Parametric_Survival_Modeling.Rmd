@@ -223,50 +223,50 @@ death, sex, death in hospital (hospdead), days study entry to discharge (slos), 
 15. For urine output day 3 (urine), a numeric variable. The outliers are excessive, but appear in the medical literature.
 \end{tcolorbox}
 ```{r}
-# # 1
-# boxplot(ac$age, xlab = "Age")
-# 
-# # 2
-# boxplot(ac$avtisst, xlab = "TISS")
-# 
-# # 3
-# boxplot(ac$meanbp, xlab = "Mean Blood Pressue")
-# 
-# #4 
-# boxplot(ac$hrt, xlab = "Heart Rate")
-# 
-# # 5
-# boxplot(ac$resp, xlab = "Respiration")
-# 
-# # 6
-# boxplot(ac$temp, xlab = "Temperature")
-# 
-# # 7
-# boxplot(ac$pafi, xlab = "PAFI")
-# 
-# # 8
-# boxplot(ac$alb, xlab = "Albumin")
-# 
-# # 9
-# boxplot(ac$bili, xlab = "Bilirubin")
-# 
-# # 10
-# boxplot(ac$crea, xlab = "Serum Creatinine")
-# 
-# # 11
-# boxplot(ac$sod, xlab = "Serum Sodium")
-# 
-# # 12
-# boxplot(ac$ph, xlab = "pH")
-# 
-# # 13
-# boxplot(ac$glucose, xlab = "Glucose")
-# 
-# # 14
-# boxplot(ac$bun, xlab = "Blood Urea Nitrogen")
-# 
-# # 15
-# boxplot(ac$urine, xlab = "Urine Output")
+# 1
+boxplot(ac$age, xlab = "Age")
+
+# 2
+boxplot(ac$avtisst, xlab = "TISS")
+
+# 3
+boxplot(ac$meanbp, xlab = "Mean Blood Pressue")
+
+#4
+boxplot(ac$hrt, xlab = "Heart Rate")
+
+# 5
+boxplot(ac$resp, xlab = "Respiration")
+
+# 6
+boxplot(ac$temp, xlab = "Temperature")
+
+# 7
+boxplot(ac$pafi, xlab = "PAFI")
+
+# 8
+boxplot(ac$alb, xlab = "Albumin")
+
+# 9
+boxplot(ac$bili, xlab = "Bilirubin")
+
+# 10
+boxplot(ac$crea, xlab = "Serum Creatinine")
+
+# 11
+boxplot(ac$sod, xlab = "Serum Sodium")
+
+# 12
+boxplot(ac$ph, xlab = "pH")
+
+# 13
+boxplot(ac$glucose, xlab = "Glucose")
+
+# 14
+boxplot(ac$bun, xlab = "Blood Urea Nitrogen")
+
+# 15
+boxplot(ac$urine, xlab = "Urine Output")
 ```
 
 # Choosing a Tentative Model
@@ -840,29 +840,28 @@ a <- ols(
 fastbw(a, aics = 10000)  
 ```
 
-
 # Fitting an approximate Ordinary Least Squares model
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Here you have to fit an approximate Ordinary Least Squares model in order to predict the predicted values using the the subset of variables which were retained in the less complex model. That model presents the same R squared (.957) as the full model.\\
 
-You want to inherit the full model's variances to use for the confidence intervals of the less complex model. Becasue this uses maximum likelihood estimations with censored data (if there were no censored survival times this would just be ordinary least squares on log survival time) the full model's and its unbiased variance estimates comes from the full model's fit.\\
+You want to inherit the full model's variances to use for the confidence intervals of the less complex model. Because this uses maximum likelihood estimations with censored data (if there were no censored survival times this would just be ordinary least squares on log survival time) the full model and its unbiased variance estimates comes from the full model's fit.\\
 
 You take the sum of squared residuals, divided by n - p - 1, in which p is the largest value we had entertained for the number of degrees of freedom for the prediction. So, the sigma squared figures which comes out of that needs to drive our final confidence intervals, and this approach will take care of that.\\
 
-Now you can get the variance/covariance matrix for the approximate model, which is really derived from the variance/covariance matrix of the full model, as well as the linear contrasts which are used to map the full model coefficients into the approximate model coefficients. That’s what the formula at the bottom of this code.\\
+Now you can get the variance/covariance matrix for the approximate model, which is really derived from the variance/covariance matrix of the full model, as well as the linear contrasts which are used to map the full model coefficients into the approximate model coefficients. That’s what the formula at the bottom of this code does, at “Mapping the full model's coefficients onto the approximate model coefficients”.\\
 
-You can see how this matters with the variance of certain variables using the approximate model versus the original model. You can do an ANOVA (Analysis of variance) on this adjusted covariance matrix that you see under the Wald statistics table.\\
+You can see how this matters with the variance of certain variables using the approximate model versus the original model. You can do an ANOVA (analysis of variance) on this adjusted covariance matrix that you see under the Wald statistics table.\\
 
 Analysis of variance usually refers to an analysis of a continuous dependent variable where all the predictor variables are categorical.
 
 The equation for the simplified model is coming from this f.approx object — it’s from an Ordinary Least Squares model and doesn't have to take censoring into account because we’re predicting predicted values, not survival time.\\
 
-This model is .957 accurate. This is the simplest form of the predictions and inclucdes the expansion of the spline terms for the continuous variables.\\
+This model is .957 accurate. This is the simplest form of the predictions and includes the expansion of the spline terms for the continuous variables.\\
 
 This model is also the basis for the nomogram, which is coming up. 
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. ols() {rms} is a linear model estimation using ordinary least squares. It fits the usual weighted or unweighted linear regression model using the same fitting routines used by lm, but also storing the variance-covariance matrix var and using traditional dummy-variable coding for categorical factors.\\
+1. Using ols() again, as immediately above, at line 830.\\
 
 2. Printing the new model's statistics.
 \end{tcolorbox}
@@ -890,7 +889,7 @@ f.approx$stats
 
 4. This creates a contrast matrix for the full and approximate models.\\
 
-5. This formula maps the full model's coefficients onto the approximate model coefficients.
+5. This formula maps the full model's coefficients onto the approximate model’s coefficients.
 \end{tcolorbox}
 ```{r}
 # 1
@@ -909,18 +908,18 @@ w <- solve(t(x) %*% x, t(x)) %*% X
 v <- w %*% V %*% t(w)
 ```
 
-
 # Approximate model's estimated variances
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Here you compare the variance estimates — the diagonals of v — with variance estimates from the reduced model ﬁtted against the actual outcomes.\\
-The approximate model's estimated variances are somewhat slightly smaller than those that you would have gotten from stepwise variable selection employing a stopping rule to select the same set of variables.
+
+The approximate model's estimated variances are slightly smaller than those that you would have gotten from stepwise variable selection employing a stopping rule to select the same set of variables.
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
 1. Fit the reduced model against the actual outcomes.\\
 
 2. Comparing the variance estimates (the diagonals of v) with variance estimates from the simplified model fitted against the actual outcomes.\\
 
-3. diag() {base} extracts or replaces the diagonal of a matrix, or construct a diagonal matrix. Here it constructs a diagonal matrix.
+3. diag() from the base package extracts or replaces the diagonal of a matrix, or constructs a diagonal matrix. Here it constructs a diagonal matrix.
 \end{tcolorbox}
 ```{r}
 # 1
@@ -938,10 +937,10 @@ diag(v) / diag(vcov(f.sub , regcoef.only = TRUE))
 r <- diag(v) / diag(vcov(f.sub, regcoef.only = TRUE))
 r[c(which.min(r), which.max(r))]
 ```
-
+#LO
 # The Wald statistics for the reduced model
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-In the results you can note the similarity between these statistics and those from the  Wald statistics table for the full model. Had been very collinear with the kept/retained variables these similarities would not be the case.
+In the results you can note the similarities between these statistics and those from the  Wald statistics table for the full model. Had they been very collinear with the kept/retained variables these similarities would not be the case.
 \end{tcolorbox}
 
 ```{r}
