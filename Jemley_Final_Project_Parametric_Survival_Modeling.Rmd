@@ -126,7 +126,7 @@ There is very little missing data on most of the variables, but we can also see 
 1. naclus() from Hmisc detects similarities among observations with missing variables in a data frame. The similarity measure is the fraction of NAs in common between any two variables. 
 \end{tcolorbox}
 ```{r missing_data_pattern_detection}
-# 1
+# 1 
 plot(naclus(support[acute, ]))
 ```
 
