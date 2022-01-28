@@ -569,7 +569,7 @@ f <- psm(
 )
 
 # 3
-plot(anova(f)) 
+plot(anova(f))
 ```
 
 # From the output from the model we see:
@@ -609,7 +609,7 @@ f_2 <- psm(
 print(f_2, coefs = FALSE)
 
 a <- anova(f_2)
-a
+print(a)
 ```
 
 # Summary of the Fitted Model
@@ -767,11 +767,11 @@ Calibration refers to the reliability of predicted values, i.e., the extent to w
 
 There are 2 ways to validate the calibration curve. The old way is stratifying the predictions, in this example with 60 patients per group, and within each group you get the average prediction for the group. It’s very important not to use the midpoint but the average instead.\\
 
-But would bias ("bend") the data, which is always asking for trouble. Stratification involves "binning" of continuous variables which substantially reduces the amount of information in them.\\
+But that would bias ("bend") the data, which is always asking for trouble. Stratification involves "binning" of continuous variables which substantially reduces the amount of information in them.\\
 
 To prevent this you use the bootstrap validation of the calibration curve which is the default in the calibrate() function {rms} for survival models. This method is more precise because it effectively uses interpolation across levels of predicted values, unlike the binning/categorization which stratification uses, and which creates the noisy line with a lot or variability.\\
 
-Here the dots represent the accuracy of the calibration accuracy. X's are estimates from the bootstrapwith their overﬁtting corrected. The corrected overfittings were the result of predicted survival probabilities being binned as described immmediately above, along with their Kaplan-Meier estimates. The black curve is the relationship of patients' conditions to their predicted survival estimates using calibrate()'s "hare" method, and the blue curve is the overfitted estimate of the same. The gray line is the "ideal" statistical relationship.\\
+Here the dots represent the accuracy of the calibration. X's are estimates from the bootstrap with their overﬁtting corrected. The corrected overfittings were the result of predicted survival probabilities being binned as described immmediately above, along with their Kaplan-Meier estimates. The black curve is the relationship of patients' conditions to their predicted survival estimates using calibrate()'s "hare" method, and the blue curve is the overfitted estimate of the same. The gray line is the "ideal" statistical relationship.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
 1. calibrate() {rms} uses bootstrapping here to get bias-corrected, or overfitting corrected, estimates of predicted vs. observed values based on subsetting predictions into intervals (for survival models) or on nonparametric smoothers (for other models).
