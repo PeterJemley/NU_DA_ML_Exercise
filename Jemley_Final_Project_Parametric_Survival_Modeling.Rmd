@@ -1,5 +1,6 @@
 ---
-title: "Case_Study_Parametric_Survival_Modeling"
+title: "Case Study: Prognostic Nomograms from Parametric Survival Modeling"
+subtitle: "Final Project, DA 5030 Data Mining and Machine Learning"
 author: "Peter Jemley"
 date: "4/3/2020"
 output:
@@ -20,11 +21,6 @@ header-includes:
 - \usepackage[shortlabels]{enumitem}
 - \usepackage{dcolumn}
 ---
-# Title
-\begin{tcolorbox}[width=\textwidth]
-Final Project, DA 5030 Data Mining and Machine Learning, Peter Jemley
-Case Study Introduction: Prognostic Nomograms from Parametric Survival Modeling
-\end{tcolorbox}
 
 # Introduction
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
@@ -67,6 +63,10 @@ In the study patients had to survive until Day 3 to qualify, and the baselines a
 Scrub the environment, load libraries, and attach required special transformation functions from the {rms} package, then scrub the console.
 \end{tcolorbox}
 ```{r}
+library(ggplot2)
+library(knitr)
+
+
 rm(list = ls())
 cat("\014")
 
@@ -93,7 +93,7 @@ Acute illnesses are flagged categories of interest, consisting of — Acute Resp
 \begin{tcolorbox}[width=\textwidth]
 1. Retrieve the study's data.\\
 2. Flagging categories of interest.\\
-3. Display descriptive statistics.
+3. Display descriptive statistics (code is commented out to save printing space).
 \end{tcolorbox}
 ```{r}
 # 1
@@ -103,7 +103,7 @@ getHdata(support)
 acute <- support$dzclass %in% c('ARF/MOSF', 'Coma')
 
 # 3
-describe(support[acute,])
+# describe(support[acute,])
 ```
 
 # Hierarchical Cluster Analysis — Showing Patterns in any Missing Data
@@ -178,6 +178,7 @@ Each of the following are unsuitable to boxplot()s:\\
 death, sex, death in hospital (hospdead), days study entry to discharge (slos), days of follow-up (d.time), disease group (dzgroup), disease class (dzclass), number of co-morbidities (num.co), income, SUPPORT coma score (scoma), hospital charges (charges), total micro-cost (totmcst), race, white blood cell count (wblc), all of the activities of daily living (adlp, adls, adlsc), and sfdm (severe functional disability). Their values and ranges were verified using the describe() function.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
+(Code is commented out to save printing space.)
 1. For age, a numeric variable.\\
 2. For average TISS (avtisst, the Therapeutic Intervention Scoring System, which is a method for calculating costs in the intensive care unit (ICU) and intermediate care unit (IMCU) of a hospital), a numeric variable.\\
 3. For mean arterial blood pressure, a numeric variable.\\
@@ -195,50 +196,50 @@ death, sex, death in hospital (hospdead), days study entry to discharge (slos), 
 15. For urine output day 3 (urine), a numeric variable. The outliers are excessive, but appear in the medical literature.
 \end{tcolorbox}
 ```{r}
-# 1
-boxplot(ac$age, xlab = "Age")
-
-# 2
-boxplot(ac$avtisst, xlab = "TISS")
-
-# 3
-boxplot(ac$meanbp, xlab = "Mean Blood Pressue")
-
-#4 
-boxplot(ac$hrt, xlab = "Heart Rate")
-
-# 5
-boxplot(ac$resp, xlab = "Respiration")
-
-# 6
-boxplot(ac$temp, xlab = "Temperature")
-
-# 7
-boxplot(ac$pafi, xlab = "PAFI")
-
-# 8
-boxplot(ac$alb, xlab = "Albumin")
-
-# 9
-boxplot(ac$bili, xlab = "Bilirubin")
-
-# 10
-boxplot(ac$crea, xlab = "Serum Creatinine")
-
-# 11
-boxplot(ac$sod, xlab = "Serum Sodium")
-
-# 12
-boxplot(ac$ph, xlab = "pH")
-
-# 13
-boxplot(ac$glucose, xlab = "Glucose")
-
-# 14
-boxplot(ac$bun, xlab = "Blood Urea Nitrogen")
-
-# 15
-boxplot(ac$urine, xlab = "Urine Output")
+# # 1
+# boxplot(ac$age, xlab = "Age")
+# 
+# # 2
+# boxplot(ac$avtisst, xlab = "TISS")
+# 
+# # 3
+# boxplot(ac$meanbp, xlab = "Mean Blood Pressue")
+# 
+# #4 
+# boxplot(ac$hrt, xlab = "Heart Rate")
+# 
+# # 5
+# boxplot(ac$resp, xlab = "Respiration")
+# 
+# # 6
+# boxplot(ac$temp, xlab = "Temperature")
+# 
+# # 7
+# boxplot(ac$pafi, xlab = "PAFI")
+# 
+# # 8
+# boxplot(ac$alb, xlab = "Albumin")
+# 
+# # 9
+# boxplot(ac$bili, xlab = "Bilirubin")
+# 
+# # 10
+# boxplot(ac$crea, xlab = "Serum Creatinine")
+# 
+# # 11
+# boxplot(ac$sod, xlab = "Serum Sodium")
+# 
+# # 12
+# boxplot(ac$ph, xlab = "pH")
+# 
+# # 13
+# boxplot(ac$glucose, xlab = "Glucose")
+# 
+# # 14
+# boxplot(ac$bun, xlab = "Blood Urea Nitrogen")
+# 
+# # 15
+# boxplot(ac$urine, xlab = "Urine Output")
 ```
 
 # Choosing a Tentative Model
@@ -595,7 +596,7 @@ Whereas the race and sex variables are not very relevant.\\
 1. Predict() {rms} computes predicted values and confidence limits. It allows the user to easily specify which predictors are to vary. Predicted values are the linear predictor (X beta), a user-specified transformation of that scale, or estimated probability of surviving past a fixed single time point given the linear predictor. Predict is usually used for plotting predicted values.
 \end{tcolorbox}
 1a. This includes a ggplot method for Predict() objects which makes it easy to visualize predicted values and their confidence bands.
-```{r model_summary, fig.height = 5, fig.width = 5}
+```{r model_summary}
 # 1
 # 1a
 ggplot(
@@ -879,10 +880,8 @@ The Wald statistics for the reduced model.\\
 
 In the results you can note the similarity between these statistics and those from the same Wald statistics table for the full model. Had been very collinear with the kept/retained variables these similarities would not be the case.
 \end{tcolorbox}
-#LO
-```{r}
-# f.approx$var <- v
 
+```{r}
 print(anova(f.approx, test = 'Chisq', ss = FALSE), size = 'tsz')
 ```
 
@@ -922,7 +921,9 @@ You can also improve the labels for the axes of the nomogram, which I did.\\
 Next you apply the nomogram() function on the approximate model, control where some of the tick marks are placed, and add some functions to the normal output: the median survival time function, and the mean survival time function.\\
 
 Then you plot that and we see the nomogram in which all the variables have been mapped into a common 0-100 point scale. You see that among the disease groups Acute Respiratory Failures ("ARF"),  Multiple Organ Systems Failures w/sepsis actually has the highest survival time, but this is before being adjusted for all the other variables that are taken into account for how sick the patients are in this group.\\
+\end{tcolorbox}
 
+\begin{tcolorbox}[width=\textwidth, colback={yellow}]
 You see that mean arterial bp is fairly nonlinear, and a very strong effect because it has a very stretched axis.\\
 
 Serum creatinine is a very non monotonic function so it has the worst effect on survival at its lowest value of 5, then as it increases it postively affects survival. Here’s an example of where domain knowledge within a multivariate context like this provides additional interpretive help. It’s “good” in this patient context to have a high creatinine level because almost all patients with high creatinine are on dialysis have to be stable to do so — dialysis is able to keep them living in the short term very well. That's why you get a strong survival effect on the right end of the creatinine scale.\\
@@ -937,9 +938,9 @@ You add up the points you get from each variable, calculate total points, and im
 
 If you look at where the linear predictor is zero and carry that straight down the median has to be 1 because the antilog of zero is 1.\\ 
 
-The mean survival time when the median is 1 is about 10 years, so the distribution that we’re fitting is highly skewed with a very heavy right tail, making the mean much higher than the median survival time. But you can learn a lot about the model and how you can predict different outcome metrics from this nomogram. 
+The mean survival time when the median is 1 is about 10 years, so the distribution that we’re fitting is highly skewed with a very heavy right tail, making the mean much higher than the median survival time. But you can learn a lot about the model and how you can predict different outcome metrics from this nomogram.
 \end{tcolorbox}
-```{r out.height = '1.0\\linewidth', out.width = '1.0\\linewidth'}
+```{r}
 # Derive S functions that express means and quantiles of survival time for 
 # specific linear predictors analytically.
 # Mean is a generic function that returns an R function to compute the estimate
@@ -975,14 +976,10 @@ nom <-
     ),
     fun.at = c(.1, .25, .5, 1, 2, 5, 10, 20, 40)
   )
-# plot(nom,
-#      cex.var = 1,
-#      cex.axis = .75,
-#      lmgp = .25)
 
 plot(nom,
-     cex.var = .5,
-     cex.axis = .4,
+     cex.var = 1,
+     cex.axis = .6,
      lmgp = .25)
 ```
 
