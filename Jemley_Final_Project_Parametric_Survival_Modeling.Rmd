@@ -75,29 +75,26 @@ rms, for example, contains a series of special transformation functions, fitting
 library(ggplot2)
 library(knitr)
 
-
-rm(list = ls())
-cat("\014")
-
 suppressMessages({
   require(Hmisc)
   require(rms)
 })
+
+rm(list = ls())
+cat("\014")
 ```
 
 # The SUPPORT Study
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-Note: In the narrative descriptions below, "()" denote functions; "{}" denote packages.\\
-
 The getHdata() function from the {Hmisc} package downloads and prepares datasets stored on Vanderbilt’s Biostatistics website for use in statistical modeling environments. When using getHdata() in R, these datasets are de-compressed with R’s load() function {base}, having been compressed for storage with R’s save() function. After loading, getHdata() runs the cleanup.import() function {Hmisc}, which corrects errors and shrinks sizes of data frames, for example by changing double-precision numeric variables to integers when no fractional components are present.\\
 
 The distributions, including the bimodal distributions seen clearly in the mean arterial BP (worse and best), heart rate (high and low), and temperature (high and low), are very smooth. There’s a lot of information in this dataset and the patients are well-characterized by these data.\\
 
 Extra precautionary measures were taken by those conducting the study. The data collected were double-checked for accuracy by a second medical abstractor: "Patient identification and data collection procedures included ongoing reliability testing. General physiologic measures were collected by a second nurse abstractor from a random 10% sample of patients within 3 to 10 days of the initial data collection." (The SUPPORT Prognostic Model, Annals of Internal Medicine, 1995; 122 : 191-203).\\
 
-describe() produces tables for each variable which contain the number of occurrences of the variable in the dataset, whether any values are missing, the number of distinct observations, and summary statistics. describe() includes Gini's mean difference (denoted as "Gmd"), which quantifies the dispersion among the variables' values in terms of the mean absolute difference between all pairs of observations.\\
-
 Acute illnesses are flagged categories of interest, consisting of — Acute Respiratory Failures ("ARF"),  Multiple Organ Systems Failures ("MOSF"), and Coma ("Coma").\\
+
+Note: to save space in this document I have not implemented the Hmisc function describe(). It produces tables for each variable which contain the number of occurrences of the variable in the dataset, whether any values are missing, the number of distinct observations, and summary statistics. describe() includes Gini's mean difference (denoted as "Gmd"), which quantifies the dispersion among the variables' values in terms of the mean absolute difference between all pairs of observations.
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
 1. Retrieve the study's data.\\
@@ -112,7 +109,7 @@ getHdata(support)
 acute <- support$dzclass %in% c('ARF/MOSF', 'Coma')
 
 # 3
-latex(describe(support[acute,]))
+# describe(support[acute,])
 ```
 
 # Hierarchical Cluster Analysis: Showing Patterns in any Missing Data
