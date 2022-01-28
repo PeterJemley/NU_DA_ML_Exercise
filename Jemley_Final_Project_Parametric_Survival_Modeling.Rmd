@@ -4,9 +4,12 @@ author: "Peter Jemley"
 date: "4/3/2020"
 output:
   pdf_document: 
-    fig_crop: no
     number_sections: yes
     highlight: zenburn
+    fig_width: 8
+    fig_height: 7
+    fig_caption: yes
+    fig_crop: no
   html_document:
     df_print: paged
   word_document: default
@@ -1001,19 +1004,26 @@ The mean survival time when the median is 1 is about 10 years, so the distributi
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Note: The nomogram and a few other plots render somewhat poorly in a PDF. When printed or viewed in the plot viewer, however, their formatting is correct.
 \end{tcolorbox}
-# TIDY THIS CODE WITH A COLORBOX
+
+\begin{tcolorbox}[width=\textwidth]
+1. Derive S functions that express means and quantiles of survival time for specific linear predictors analytically. Mean is a generic function that returns an R function to compute the estimate of the mean of a variable. Its input is typically some kind of model fit object, as you have here..\\
+
+2. Improve variable labels for the nomogram.\\
+
+3. Generate the nomogram.\\
+
+3a. nomogram() {rms} draws a partial nomogram that can be used to manually obtain predicted values from a regression model that was fitted with rms. The nomogram does not have lines representing sums, but it has a reference line for reading scoring points (default range 0–100). Once the reader manually totals the points, the predicted values can be read at the bottom. Non-monotonic transformations of continuous variables are handled (scales wrap around), as are transformations which have flat sections (tick marks are labeled with ranges). If interactions are in the model, one variable is picked as the “axis variable”, and separate axes are constructed for each level of the interacting factors (preference is given automatically to using any discrete factors to construct separate axes) and levels of factors which are indirectly related to interacting factors (see DETAILS). Thus the nomogram is designed so that only one axis is actually read for each variable, since the variable combinations are disjoint.\\
+
+4. Plot it. 
+\end{tcolorbox}
 ```{r}
-# Derive S functions that express means and quantiles of survival time for 
-# specific linear predictors analytically.
-# Mean is a generic function that returns an R function to compute the estimate
-# of the mean of a variable. Its input is typically some kind of model fit object.
+# 1
 expected.surv <- Mean(f_2)
 quantile.surv <- Quantile(f_2)
-
 median.surv   <- function(x)
   quantile.surv(lp = x)
 
-# Improve variable labels for the nomogram
+# 2
 f.approx <- Newlabels(
   f.approx,
   c(
@@ -1028,6 +1038,8 @@ f.approx <- Newlabels(
     'Resp. Rate'
   )
 )
+
+# 3
 nom <-
   nomogram(
     f.approx,
@@ -1039,6 +1051,7 @@ nom <-
     fun.at = c(.1, .25, .5, 1, 2, 5, 10, 20, 40)
   )
 
+# 4
 plot(nom,
      cex.var = 1,
      cex.axis = .6,
