@@ -127,7 +127,7 @@ There is very little missing data on most of the variables, but we can also see 
 \end{tcolorbox}
 ```{r missing_data_pattern_detection}
 # 1 
-plot(naclus(support[acute, ]))
+plot(naclus(support[acute, ]))  
 ```
 
 
@@ -141,7 +141,7 @@ varclus() implements a hierarchical cluster analysis on variables, using the Hoe
 
 The measure's range is a little hard to understand — but it’s so general it can detect relationships between variables having high dependencies.\\
 
-So we can see that the two variables whose values are the most similar to each other are serum creatinine and serum bun — both measures of renal function.\\
+So we can see that the two variables whose values are the most similar to each other are serum creatinine and serum blood urea nitrogen — both measures of renal function.\\
 
 This is the closest case in this dataset in which two variables could be considered redundant.
 \end{tcolorbox}
@@ -161,7 +161,7 @@ This is the closest case in this dataset in which two variables could be conside
 ac <- support[acute, ]
 
 # 2
-ac$dzgroup <- ac$dzgroup[drop = TRUE]
+ac$dzgroup <- ac$dzgroup[drop = TRUE] 
 
 # 3
 label(ac$dzgroup) <- 'Disease Group'
@@ -223,50 +223,50 @@ death, sex, death in hospital (hospdead), days study entry to discharge (slos), 
 15. For urine output day 3 (urine), a numeric variable. The outliers are excessive, but appear in the medical literature.
 \end{tcolorbox}
 ```{r}
-# 1
-boxplot(ac$age, xlab = "Age")
-
-# 2
-boxplot(ac$avtisst, xlab = "TISS")
-
-# 3
-boxplot(ac$meanbp, xlab = "Mean Blood Pressue")
-
-#4
-boxplot(ac$hrt, xlab = "Heart Rate")
-
-# 5
-boxplot(ac$resp, xlab = "Respiration")
-
-# 6
-boxplot(ac$temp, xlab = "Temperature")
-
-# 7
-boxplot(ac$pafi, xlab = "PAFI")
-
-# 8
-boxplot(ac$alb, xlab = "Albumin")
-
-# 9
-boxplot(ac$bili, xlab = "Bilirubin")
-
-# 10
-boxplot(ac$crea, xlab = "Serum Creatinine")
-
-# 11
-boxplot(ac$sod, xlab = "Serum Sodium")
-
-# 12
-boxplot(ac$ph, xlab = "pH")
-
-# 13
-boxplot(ac$glucose, xlab = "Glucose")
-
-# 14
-boxplot(ac$bun, xlab = "Blood Urea Nitrogen")
-
-# 15
-boxplot(ac$urine, xlab = "Urine Output")
+# # 1
+# boxplot(ac$age, xlab = "Age")
+# 
+# # 2
+# boxplot(ac$avtisst, xlab = "TISS")
+# 
+# # 3
+# boxplot(ac$meanbp, xlab = "Mean Blood Pressue")
+# 
+# #4
+# boxplot(ac$hrt, xlab = "Heart Rate")
+# 
+# # 5
+# boxplot(ac$resp, xlab = "Respiration")
+# 
+# # 6
+# boxplot(ac$temp, xlab = "Temperature")
+# 
+# # 7
+# boxplot(ac$pafi, xlab = "PAFI")
+# 
+# # 8
+# boxplot(ac$alb, xlab = "Albumin")
+# 
+# # 9
+# boxplot(ac$bili, xlab = "Bilirubin")
+# 
+# # 10
+# boxplot(ac$crea, xlab = "Serum Creatinine")
+# 
+# # 11
+# boxplot(ac$sod, xlab = "Serum Sodium")
+# 
+# # 12
+# boxplot(ac$ph, xlab = "pH")
+# 
+# # 13
+# boxplot(ac$glucose, xlab = "Glucose")
+# 
+# # 14
+# boxplot(ac$bun, xlab = "Blood Urea Nitrogen")
+# 
+# # 15
+# boxplot(ac$urine, xlab = "Urine Output")
 ```
 
 # Choosing a Tentative Model
@@ -348,9 +348,8 @@ Like all graphical assessments of model fit this is a subjective process but thi
 \end{tcolorbox}
 ```{r tentative_psm_model_residuals, fig.height=4, fig.width=7}
 # 1
-f <- psm(S ~ dzgroup + rcs(age, 5) + rcs(meanbp, 5),
-         dist = 'lognormal',
-         y = TRUE)
+f <- psm(S ~ dzgroup + rcs(age,5) + rcs(meanbp,5), 
+         dist='lognormal', y=TRUE)
 
 # 2
 r <- resid(f)
@@ -418,7 +417,7 @@ w <- spearman2(
 
 
 # 4
-plot(w, main = '')
+plot(w, main = '') 
 ```
 
 # A better approach to take censoring into account
@@ -489,7 +488,7 @@ sapply(llist(
 # 2
 wblc.i <- impute(wblc, 9)
 pafi.i <- impute(pafi, 333.3)
-ph.i   <- impute(ph, 7.4)
+ph.i   <- impute(ph,   7.4)
 race2  <- race
 
 # 3
@@ -599,7 +598,7 @@ The discrimination index g sub r demonstrates the typical survival time ratio of
 ```{r fit_second_psm_model}
 # 1
 # 1a
-f_2 <- psm(
+f <- psm(
   S ~ rcs(age, 5) + sex + dzgroup + num.co +
     scoma + pol(adlsc, 2) + race2 + rcs(meanbp, 5) +
     rcs(hrt, 3) + rcs(resp, 3) + temp +
@@ -607,9 +606,9 @@ f_2 <- psm(
   dist = 'lognormal'
 )
 
-print(f_2, coefs = FALSE)
+print(f, coefs = FALSE)
 
-a <- anova(f_2)
+a <- anova(f)
 print(a)
 ```
 
@@ -651,7 +650,7 @@ Whereas the race and sex variables are not very relevant.\\
 # 1
 # 1a
 ggplot(
-  Predict(f_2, ref.zero = TRUE),
+  Predict(f, ref.zero = TRUE),
   vnames = 'names',
   sepdiscrete = 'vertical',
   anova = a
@@ -686,7 +685,7 @@ plot(a)
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 The summary function is used with the option log equals true which produces a prediction with the log normal accelerated failure time model for log survival time — if you anti-log that you’re getting predicted median survival time, and the effect ratios that are wanted are going to be ratios of median survival time. If the standard deviation is constant these are also ratios of mean survival time. Therefore I used a log scale for plotting.\\
 
-It gives output with blue bars with point estimates shown with a triangle in the middle with various confidence intervals. For example, as age changes from its lower quartile to its upper quartile (47.9 to 74.5), there is a decrease in median survival time by over 50%. The bars’ shaded areas refer to diﬀerent levels of conﬁdence (0.9 / 0.95 / 0.99).\\
+It gives output with blue bars with point estimates shown with a triangle in the middle with various confidence intervals. For example, as age changes from its lower quartile to its upper quartile (47.9 to 74.5), there is a decrease in median survival time by over 50 percent The bars’ shaded areas refer to diﬀerent levels of conﬁdence (0.9, 0.95, 0.99).\\
 
 The biggest effect is shown in the difference between having acute respiratory failure with multiple organ system failure with sepsis compared to being septic and in a coma. Being septic and in a coma is worse, with survival cut by almost a factor of 10, so the ratio is a little bigger than 0.1.\\
 \end{tcolorbox}
@@ -700,7 +699,7 @@ The biggest effect is shown in the difference between having acute respiratory f
 options(digits = 3)
 
 # 2
-plot(summary(f_2), log = TRUE, main = '')
+plot(summary(f), log = TRUE, main = '')
 ```
 
 # Internal Validation of the Fitted Model Using the Bootstrap
@@ -742,16 +741,15 @@ So, overall validate() indicates a moderate amount of overfitting but the shrink
 \end{tcolorbox}
 ```{r validate_indexes}
 # 1
-g <- update(f_2, x = TRUE, y = TRUE)
+g <- update(f, x = TRUE, y = TRUE)
 
 # 2
 set.seed(717)
 
 # 3
 suppressWarnings({
-  print(rms::validate(
+  print(validate(
     g,
-    method = "boot",
     B = 400,
     dxy = TRUE
   ), digits = 2)
@@ -773,7 +771,11 @@ But that would bias ("bend") the data, which is always asking for trouble. Strat
 
 To prevent this you use the bootstrap validation of the calibration curve which is the default in the calibrate() function from the rms package for survival models. This method is more precise because it effectively uses interpolation across levels of predicted values, unlike the binning/categorization which stratification uses, and which creates the noisy line with a lot or variability.\\
 
-Here the dots represent the accuracy of the calibration. X's are estimates from the bootstrap with their overﬁtting corrected. The corrected overfittings were the result of predicted survival probabilities being binned as described immediately above, along with their Kaplan-Meier estimates. The black curve is the relationship of patients' conditions to their predicted survival estimates using calibrate()'s "hare" method, and the blue curve is the overfitted estimate of the same. The gray line is the "ideal" statistical relationship.\\
+Here the dots represent the accuracy of the calibration. X's are estimates from the bootstrap with their overﬁtting corrected. The corrected overfittings were the result of predicted survival probabilities being binned as described immediately above, along with their Kaplan-Meier estimates. The black curve is the relationship of patients' conditions to their predicted survival estimates using calibrate()'s "hare" method, and the blue curve is the overfitting corrected estimate of the same, i.e. the actual observed outcomes. The 45 degree gray line is the "ideal" statistical relationship.\\
+
+The blue curve is a little further from the 45 degree line than the black curve, and the blue curve is our estimate of future performance in terms of absolute prediction ability on the probability of surviving one year.\\
+
+The smooth blue curve is far smoother than the stratified Kaplan-Meier estimates, which are using a sample size resulting in a lot of noise.
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
 1. calibrate() uses bootstrapping here to get bias-corrected, or overfitting corrected, estimates of predicted vs. observed values based on subsetting predictions into intervals (for survival models) or on nonparametric smoothers (for other models).
@@ -813,7 +815,7 @@ You can stop at the point which the variables at the top of the list that are dr
 This method would also have to be reproducible, but that’s beyond the scope of this case study.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. predict() from the stats package (with a lower case p) is a generic function for predictions from the results of various model fitting functions.\\
+1. predict() from the stats package (with a lower case p) is a generic function for predictions from the results of various model fitting functions: X times Beta hat\\
 $$ X*\hat{\beta} $$ 
 2. ols() from the rms package is a linear model estimation using ordinary least squares. It fits the usual weighted or unweighted linear regression model using the same fitting routines used by lm() (the stats package function for fitting linear models), but also storing the variance-covariance matrix and using traditional dummy-variable coding for categorical factors.\\
 
@@ -822,8 +824,8 @@ $$ X*\hat{\beta} $$
 3. fastbw() from the rms package performs a numerically stable version of fast backward elimination on factors. It uses a fitted complete model and computes approximate Wald statistics by computing conditional (restricted) maximum likelihood estimates assuming multivariate normality of estimates.
 \end{tcolorbox}
 ```{r}
-# 1
-Z <- predict(f_2)    
+# 1 X times Beta hat
+Z <- predict(f)
 
 
 # 2
@@ -835,6 +837,7 @@ a <- ols(
     rcs(pafi.i, 4),
   sigma = 1
 )
+
 
 # 3
 fastbw(a, aics = 10000)  
@@ -889,11 +892,11 @@ f.approx$stats
 
 4. This creates a contrast matrix for the full and approximate models.\\
 
-5. This formula maps the full model's coefficients onto the approximate model’s coefficients.
+5. Creating the variable containing the full model's variances to map onto the approximate model’s variances below in the sections which produces Wald statistics for the simplified model.
 \end{tcolorbox}
 ```{r}
 # 1
-V <- vcov(f_2, regcoef.only = TRUE)
+V <- vcov(f, regcoef.only = TRUE)
 
 # 2
 X <- cbind(Intercept = 1, g$x)
@@ -930,27 +933,33 @@ f.sub <- psm(
   dist = 'lognormal'
 )
 
+
 # 2
-diag(v) / diag(vcov(f.sub , regcoef.only = TRUE))
+diag(v) / diag(vcov(f.sub, regcoef.only = TRUE))
 
 # 3
 r <- diag(v) / diag(vcov(f.sub, regcoef.only = TRUE))
 r[c(which.min(r), which.max(r))]
 ```
-#LO
 # The Wald statistics for the reduced model
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-In the results you can note the similarities between these statistics and those from the  Wald statistics table for the full model. Had they been very collinear with the kept/retained variables these similarities would not be the case.
+1. Mapping the full model's variances onto the approximate model’s variances.
+
+2. In the results you can note the similarities between these statistics and those from the  Wald statistics table for the full model. Had they been very collinear with the kept/retained variables these similarities would not be the case.
 \end{tcolorbox}
 
 ```{r}
+# 1
+f.approx$var <- v
+
+# 2
 print(anova(f.approx, test = 'Chisq', ss = FALSE), size = 'tsz')
 ```
 
 # The final equation on which the nomogram is based:
-$$E(Z) = X\beta,\ where$$
+$$E(Z) = X*\beta,\ where$$
 
-$$X\hat{\beta}=-2.51 -1.94[{\rm Coma}]-1.75[{\rm MOSF\ w/Malig}] + 0.068{\rm meanbp}_{+}$$
+$$X*\hat{\beta}=-2.51 -1.94[{\rm Coma}]-1.75[{\rm MOSF\ w/Malig}] + 0.068{\rm meanbp}_{+}$$
 $$-3.08\!\times\!10^{-5}({\rm meanbp}-41.8)^{3}+7.9\!\times\!10^{-5  }({\rm meanbp}-61)_{+}^{3}$$ 
 
 $$-4.91\!\times\!10^{-5}({\rm meanbp}-73)_{+}^{3}+2.61\!\times\!10^{-6 }({\rm meanbp}-109)_{+}^{3}$$
@@ -970,25 +979,23 @@ $$\ \ 0\ \ otherwise\ \ (x)_{+}=x\ \ if \ \ x > 0,\ \ 0\ \ otherwise$$
 
 # A simpler representation of the model
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-Having cut out variables which are not predictive of the predicted values from the full model you're going to show a variety of quantities.\\
+Now you’ve cut out variables which are not  accurately predictive of the predicted values from the full model. Once you fit your model you can get more types of predictive quantities from a parametric model than you can from a Cox Proportional Hazards semi-parametric model. You can’t really get a mean survival time from a Cox model unless everyone is followed until death or perhaps if your censoring for those still alive is very, very late.\\
 
-Once you fit your model you can get even more quantities from a parametric model than you can from a Cox Proportional Hazards semi-parametric model. You can’t really get a mean survival time from a Cox model unless everyone is followed until death or perhaps if your censoring for those still alive is very, very late.\\
+With a parametric model it’s able to extrapolate — which is not always apposite — but which allows you to get the area under the whole survival curve which is the mean survival time. You can also get any quantiles of survival time.\\
 
-With a parametric model it’s able to extrapolate — which is not always apposite — which allows you to get the area under the whole survival curve which is the mean survival time. You can also get any quantiles of survival time.\\
-
-You derive a function using the mean function (capital M, noted in the code below) which represents the predicted mean. On the original scale you're going derive a function which can be used to translate linear predictors into quantiles. It’s taking the linear predictor and considering the log sigma value from the model, i.e. it's considering both the mean and the standard deviation on the log scale, which are needed to get the mean on the unlog scale. The quantile function is just solving for when the survival curve hits a certain level.\\
+You derive a function using the mean function (capital M, noted in the code below) which represents the predicted mean. On the original scale you're going to derive a function which can be used to translate linear predictors into quantiles. It’s taking the linear predictor and considering the log sigma value from the model, i.e. it's considering both the mean and the standard deviation on the log scale, which are needed to get the mean on the unlog scale. The quantile function is just solving for when the survival curve hits a certain level.\\
 
 You can also improve the labels for the axes of the nomogram, which I did.\\
 
 Next you apply the nomogram() function on the approximate model, control where some of the tick marks are placed, and add some functions to the normal output: the median survival time function, and the mean survival time function.\\
 
-Then you plot that and we see the nomogram in which all the variables have been mapped into a common 0-100 point scale. You see that among the disease groups Acute Respiratory Failures ("ARF"),  Multiple Organ Systems Failures w/sepsis actually has the highest survival time, but this is before being adjusted for all the other variables that are taken into account for how sick the patients are in this group.\\
+Then you plot that and we see the nomogram in which all the variables have been mapped into a common 0-100 point scale. You see that among the disease groups Acute Respiratory Failures,  Multiple Organ Systems Failures w/Sepsis (ARF/MOSF s/Sepsis) actually has the highest survival time, but this is before being adjusted for all the other variables that must be taken into account for how sick the patients are in this group.\\
 \end{tcolorbox}
 
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-You see that mean arterial bp is fairly nonlinear, and a very strong effect because it has a very stretched axis.\\
+You see that mean arterial blood pressure is fairly nonlinear, and a very strong effect because it has a very stretched axis.\\
 
-Serum creatinine is a very non monotonic function so it has the worst effect on survival at its lowest value of 5, then as it increases it postively affects survival. Here’s an example of where domain knowledge within a multivariate context like this provides additional interpretive help. It’s “good” in this patient context to have a high creatinine level because almost all patients with high creatinine are on dialysis have to be stable to do so — dialysis is able to keep them living in the short term very well. That's why you get a strong survival effect on the right end of the creatinine scale.\\
+Serum creatinine is a nonmonotonic function so it has the worst effect on survival at its lowest value of 5, then as it increases it positively affects survival. Here’s an example of where domain knowledge within a multivariate context like this provides additional interpretive help. It’s “good” in this patient context to have a high creatinine level because almost all patients with high creatinine are on dialysis and have to already be stable to be so — dialysis is able to keep them living in the short term very well. That's why you get a strong survival effect on the right end of the creatinine scale.\\
 
 Age is pretty linear, as is heart rate and the coma score.\\
 
@@ -1002,25 +1009,21 @@ If you look at where the linear predictor is zero and carry that straight down t
 
 The mean survival time when the median is 1 is about 10 years, so the distribution that we’re fitting is highly skewed with a very heavy right tail, making the mean much higher than the median survival time. But you can learn a lot about the model and how you can predict different outcome metrics from this nomogram.
 \end{tcolorbox}
-\begin{tcolorbox}[width=\textwidth, colback={yellow}]
-Note: The nomogram and a few other plots render somewhat poorly in a PDF. When printed or viewed in the plot viewer, however, their formatting is correct.
-\end{tcolorbox}
-
 \begin{tcolorbox}[width=\textwidth]
-1. Derive S functions that express means and quantiles of survival time for specific linear predictors analytically. Mean is a generic function that returns an R function to compute the estimate of the mean of a variable. Its input is typically some kind of model fit object, as you have here..\\
+1. Derive S functions that express means and quantiles of survival time for specific linear predictors analytically. Mean is a generic function that returns an R function to compute the estimate of the mean of a variable. Its input is typically some kind of model fit object, as you have here.\\
 
 2. Improve variable labels for the nomogram.\\
 
-3. Generate the nomogram.\\
+3. Implement the nomogram.\\
 
-3a. nomogram() {rms} draws a partial nomogram that can be used to manually obtain predicted values from a regression model that was fitted with rms. The nomogram does not have lines representing sums, but it has a reference line for reading scoring points (default range 0–100). Once the reader manually totals the points, the predicted values can be read at the bottom. Non-monotonic transformations of continuous variables are handled (scales wrap around), as are transformations which have flat sections (tick marks are labeled with ranges). If interactions are in the model, one variable is picked as the “axis variable”, and separate axes are constructed for each level of the interacting factors (preference is given automatically to using any discrete factors to construct separate axes) and levels of factors which are indirectly related to interacting factors (see DETAILS). Thus the nomogram is designed so that only one axis is actually read for each variable, since the variable combinations are disjoint.\\
+3a. nomogram() from the rms package draws a partial nomogram that can be used to manually obtain predicted values from a regression model that was fitted with rms. The nomogram does not have lines representing sums, but it has a reference line for reading scoring points (default range 0–100). Once the reader manually totals the points, the predicted values can be read at the bottom. Non-monotonic transformations of continuous variables are handled (scales wrap around), as are transformations which have flat sections (tick marks are labeled with ranges). If interactions are in the model, one variable is picked as the “axis variable”, and separate axes are constructed for each level of the interacting factors (preference is given automatically to using any discrete factors to construct separate axes) and levels of factors which are indirectly related to interacting factors. Thus the nomogram is designed so that only one axis is actually read for each variable, since the variable combinations are disjoint.\\
 
 4. Plot it. 
 \end{tcolorbox}
 ```{r}
 # 1
-expected.surv <- Mean(f_2)
-quantile.surv <- Quantile(f_2)
+expected.surv <- Mean(f)
+quantile.surv <- Quantile(f)
 median.surv   <- function(x)
   quantile.surv(lp = x)
 
