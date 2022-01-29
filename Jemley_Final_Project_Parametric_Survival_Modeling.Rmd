@@ -88,7 +88,7 @@ cat("\014")
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 There’s a lot of information in this dataset and the patients are well-characterized by these data.\\
 
-Extra precautionary measures were taken by those conducting the study. The data collected were double-checked for accuracy by a second medical abstractor: "Patient identification and data collection procedures included ongoing reliability testing. General physiologic measures were collected by a second nurse abstractor from a random 10% sample of patients within 3 to 10 days of the initial data collection." (The SUPPORT Prognostic Model, Annals of Internal Medicine, 1995; 122 : 191-203).\\
+Extra precautionary measures were taken by those conducting the study. The data collected were double-checked for accuracy by a second medical abstractor: "Patient identification and data collection procedures included ongoing reliability testing. General physiologic measures were collected by a second nurse abstractor from a random 10 percent sample of patients within 3 to 10 days of the initial data collection." (The SUPPORT Prognostic Model, Annals of Internal Medicine, 1995; 122 : 191-203).\\
 
 The getHdata() function from the {Hmisc} package downloads and prepares datasets stored on Vanderbilt’s Biostatistics website for use in statistical modeling environments. When using getHdata() in R, these datasets are de-compressed with R’s load() function {base}, having been compressed for storage with R’s save() function. After loading, getHdata() runs the cleanup.import() function, which corrects errors and shrinks sizes of data frames, for example by changing double-precision numeric variables to integers when no fractional components are present.\\
 
@@ -118,7 +118,7 @@ The varclus() function from Hmisc performs a hierarchical cluster analysis.\\
 
 Here you see variable clustering, specifically clustering on whether or not variables were missing. You  want to understand any patterns of holes in the data, as well as how many absences occur simultaneously for more than one variable.\\
 
-We can see that for over 40% of the patients, the same patients have missing urine output, glucose, and bun data. Those variables were not collected in the first half of the study.\\
+We can see that for over 40 percent of the patients, the same patients have missing urine output, glucose, and bun data. Those variables were not collected in the first half of the study.\\
 
 There is very little missing data on most of the variables, but we can also see that education and income tend to be missing on the same patients about 1/5 of the time. If we were going to use income for imputing education we’d be somewhat out of luck.\\
 \end{tcolorbox}
@@ -551,7 +551,7 @@ You may have thrown away the wrong terms of temperature because what little it h
 
 2. Using the rcs() function from the rsm package helps to blind researchers from becoming aware of the linear forms of continuous variables' effects, removing a source of bias.\\
 
-2a rcs() is one of a series of functions (asis, pol, lsp, rcs, catg, scored, strat, matrx, gTrans, and %ia%) that set up special attributes (such as knots and nonlinear term indicators) that are carried through to fits (using for example lrm,cph, ols, psm).  anova.rms, summary.rms, Predict, survplot, fastbw, validate, specs, which.influence, nomogram and latex.rms use these attributes to automate certain analyses (e.g., automatic tests of linearity for each predictor are done by anova.rms). Many of the functions are called implicitly.\\
+2a rcs() is one of a series of functions that set up special attributes (such as knots and nonlinear term indicators) that are carried through to fits (using for example lrm,cph, ols, psm).  anova.rms, summary.rms, Predict, survplot, fastbw, validate, specs, which.influence, nomogram and latex.rms use these attributes to automate certain analyses (e.g., automatic tests of linearity for each predictor are done by anova.rms). Many of the functions are called implicitly.\\
 
 3. Plot the ANOVA — the plot blinds analysts from seeing the forms of coefficients' effects, e.g. linearity test results.
 \end{tcolorbox}
@@ -728,7 +728,7 @@ This will cause some overfit so the Somer's Dxy increases to .51. When the model
 
 The bootstrap assumes that the difference between .51 and .46 (.46 representing usual overfitting, and .51 representing super overfitting), equals the difference between .49 and what you would like to know to subtract from .49 to give us the index that’s corrected for all overfitting. validate() estimates that index to be 43 so, 43 represents the likely future performance for patients from the same stream as the types of patients modeled here.\\
 
-The slope shrinks from 1.00 to .9 which represents an estimated regression to the mean of about 10%. This indicates that approximately 10% of everything we learned was noise.\\
+The slope shrinks from 1.00 to .9 which represents an estimated regression to the mean of about 10 percent. This indicates that approximately 10 percent of everything we learned was noise.\\
 
 So, overall validate() indicates a moderate amount of overfitting but the shrinkage factor of .9 is acceptable. The result is an unbiased estimate of the future predictive discrimination on equivalent patients as the corrected Dxy index of .43.
 \end{tcolorbox}
