@@ -189,6 +189,7 @@ Code to print boxplots is commented out below to save on printing space but they
 All conclusions about these outliers accompany the code for each boxplot, as well as explanations for those variables unsuitable to plotting. Running the describe() function on the data above, the SUPPORT Study's own abstractors' efforts, along with verifying the reference ranges shown in the boxplots for the numeric variables below, demonstrate that no outliers are present in this subset of the SUPPORT Study's data.\\
 
 Each of the following are unsuitable to boxplot()s:\\
+
 death, sex, death in hospital (hospdead), days study entry to discharge (slos), days of follow-up (d.time), disease group (dzgroup), disease class (dzclass), number of co-morbidities (num.co), income, SUPPORT coma score (scoma), hospital charges (charges), total micro-cost (totmcst), race, white blood cell count (wblc), all of the activities of daily living (adlp, adls, adlsc), and sfdm (severe functional disability). Their values and ranges were verified using the describe() function.\\
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
@@ -943,7 +944,7 @@ r[c(which.min(r), which.max(r))]
 ```
 # The Wald statistics for the reduced model
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
-1. Mapping the full model's variances onto the approximate model’s variances.
+1. Mapping the full model's variances onto the approximate model’s variances.\\
 
 2. In the results you can note the similarities between these statistics and those from the  Wald statistics table for the full model. Had they been very collinear with the kept/retained variables these similarities would not be the case.
 \end{tcolorbox}
