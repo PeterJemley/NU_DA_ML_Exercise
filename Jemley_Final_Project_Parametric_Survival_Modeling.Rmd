@@ -32,7 +32,7 @@ editor_options:
 ---
 
 
-# PRINTED FOR KING COUNTY APPLICATION
+
 # Introduction
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 For the final project I created a nomogram to graphically represent predicted mean and median survival time-windows modeled on biomedical and demographic data taken from the acutely-ill patients in the SUPPORT Study dataset archived in Vanderbilt University’s Department of Biostatistics. \\
