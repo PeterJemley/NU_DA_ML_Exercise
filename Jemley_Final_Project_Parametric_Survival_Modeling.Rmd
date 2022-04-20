@@ -351,8 +351,9 @@ Like all graphical assessments of model fit this is a subjective process but thi
 \end{tcolorbox}
 ```{r tentative_psm_model_residuals, fig.height=4, fig.width=7}
 # 1
-f <- psm(S ~ dzgroup + rcs(age,5) + rcs(meanbp,5), 
-         dist='lognormal', y=TRUE)
+f <- psm(S ~ dzgroup + rcs(age, 5) + rcs(meanbp, 5),
+         dist = 'lognormal',
+         y = TRUE)
 
 # 2
 r <- resid(f)
@@ -751,11 +752,9 @@ set.seed(717)
 
 # 3
 suppressWarnings({
-  print(validate(
-    g,
-    B = 400,
-    dxy = TRUE
-  ), digits = 2)
+  print(validate(g,
+                 B = 400,
+                 dxy = TRUE), digits = 2)
 })
 ```
 
@@ -1028,7 +1027,7 @@ The mean survival time when the median is 1 is about 10 years, so the distributi
 expected.surv <- Mean(f)
 quantile.surv <- Quantile(f)
 median.surv   <- function(x)
-  quantile.surv(lp = x)
+quantile.surv(lp = x)
 
 # 2
 f.approx <- Newlabels(
