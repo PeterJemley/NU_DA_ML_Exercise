@@ -186,7 +186,7 @@ plot(vc)
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 After creating a new data subset for modeling you can create boxplots for each variable when apposite, with explanations for what clearly appear to be outliers in the data.\\
 
-Code to print boxplots is commented out below to save on printing space but they were examined before proceeding.\
+Code to print boxplots is commented out below to save on printing space but they were examined before proceeding.\\
 
 All conclusions about these outliers accompany the code for each boxplot, as well as explanations for those variables unsuitable to plotting. Running the describe() function on the data above, the SUPPORT Study's own abstractors' efforts, along with verifying the reference ranges shown in the boxplots for the numeric variables below, demonstrate that no outliers are present in this subset of the SUPPORT Study's data.\\
 
@@ -555,7 +555,7 @@ You may have thrown away the wrong terms of temperature because what little it h
 
 2. Using the rcs() function from the rsm package helps to blind researchers from becoming aware of the linear forms of continuous variables' effects, removing a source of bias.\\
 
-2a rcs() is one of a series of functions that set up special attributes (such as knots and nonlinear term indicators) that are carried through to fits (using for example lrm,cph, ols, psm).  anova.rms, summary.rms, Predict, survplot, fastbw, validate, specs, which.influence, nomogram and latex.rms use these attributes to automate certain analyses (e.g., automatic tests of linearity for each predictor are done by anova.rms). Many of the functions are called implicitly.\\
+2a rcs() is one of a series of functions that set up special attributes (such as knots and nonlinear term indicators) that are carried through to fits (using for example lrm, cph, ols, psm).  anova.rms, summary.rms, Predict, survplot, fastbw, validate, specs, which.influence, nomogram and latex.rms use these attributes to automate certain analyses (e.g., automatic tests of linearity for each predictor are done by anova.rms). Many of the functions are called implicitly.\\
 
 3. Plot the ANOVA — the plot blinds analysts from seeing the forms of coefficients' effects, e.g. linearity test results.
 \end{tcolorbox}
@@ -826,7 +826,7 @@ $$ X*\hat{\beta} $$
 3. fastbw() from the rms package performs a numerically stable version of fast backward elimination on factors. It uses a fitted complete model and computes approximate Wald statistics by computing conditional (restricted) maximum likelihood estimates assuming multivariate normality of estimates.
 \end{tcolorbox}
 ```{r}
-# 1 X times Beta hat
+# 1: X times Beta hat
 Z <- predict(f)
 
 
@@ -853,11 +853,11 @@ You want to inherit the full model's variances to use for the confidence interva
 
 You take the sum of squared residuals, divided by n - p - 1, in which p is the largest value we had entertained for the number of degrees of freedom for the prediction. So, the sigma squared figures which comes out of that needs to drive our final confidence intervals, and this approach will take care of that.\\
 
-Now you can get the variance/covariance matrix for the approximate model, which is really derived from the variance/covariance matrix of the full model, as well as the linear contrasts which are used to map the full model coefficients into the approximate model coefficients. That’s what the formula at the bottom of this code does, at “Mapping the full model's coefficients onto the approximate model coefficients”.\\
+Now you can get the variance/covariance matrix for the approximate model, which is really derived from the variance/covariance matrix of the full model, as well as the linear contrasts which are used to map the full model coefficients into the approximate model coefficients. That’s what the formula at the bottom of this code does, at Section 26 below, “Mapping the full model's coefficients onto the approximate model coefficients”.\\
 
 You can see how this matters with the variance of certain variables using the approximate model versus the original model. You can do an ANOVA (analysis of variance) on this adjusted covariance matrix that you see under the Wald statistics table.\\
 
-Analysis of variance usually refers to an analysis of a continuous dependent variable where all the predictor variables are categorical.
+Analysis of variance usually refers to an analysis of a continuous dependent variable where all the predictor variables are categorical.\\
 
 The equation for the simplified model is coming from this f.approx object — it’s from an Ordinary Least Squares model and doesn't have to take censoring into account because we’re predicting predicted values, not survival time.\\
 
@@ -866,7 +866,7 @@ This model is .957 accurate. This is the simplest form of the predictions and in
 This model is also the basis for the nomogram, which is coming up. 
 \end{tcolorbox}
 \begin{tcolorbox}[width=\textwidth]
-1. Using ols() again, as immediately above, at line 830.\\
+1. Using ols() again, as immediately above, at Line 834.\\
 
 2. Printing the new model's statistics.
 \end{tcolorbox}
@@ -886,9 +886,9 @@ f.approx$stats
 
 #26 Mapping the full model's coefficients onto the approximate model coefficients
 \begin{tcolorbox}[width=\textwidth]
-1. This returns the variance-covariance matrix of the main parameters of a fitted model object — in this case the full model, f underscore 2.\\
+1. This returns the variance-covariance matrix of the main parameters of a fitted model object — in this case the full model.\\
 
-2. This creates the design of the full model.\\
+2. This creates the design of the full validated model.\\
 
 3. This creates the design of the simplified approximate model.\\
 
