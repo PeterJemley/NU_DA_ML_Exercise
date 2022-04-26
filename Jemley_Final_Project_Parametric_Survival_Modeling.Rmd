@@ -33,7 +33,7 @@ editor_options:
 
 
 
-#1 Introduction
+**#1 Introduction**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 For the final project I created a nomogram to graphically represent predicted mean and median survival time-windows modeled on biomedical and demographic data taken from the acutely-ill patients in the SUPPORT Study dataset archived in Vanderbilt University’s Department of Biostatistics. \\
 
@@ -44,14 +44,14 @@ With such a diagram you can instantly see the relative effect of the different p
 The SUPPORT Study (Study to Understand Prognoses, Preferences, Outcomes, and Risks of Treatments) spanned five hospitals and includes data on the critical conditions of 10,000 adult patients, all of whom were studied both for their in-patient outcomes as well as their rates of surviving their critical conditions once discharged.
 \end{tcolorbox}
 
-#2 The CRISP-DM Model
+**#2 The CRISP-DM Model**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 The CRISP-DM Model (Cross-Industry Standard Process for Data Mining) was the primary framework for this project. The process of producing a nomogram follows that model quite closely. Each of CRISP-DM's steps, as well as each of the data analysis and machine learning procedures which form this case study, are conducted sequentially here. CRISP-DM is a non-proprietary, documented, and freely available data mining model. Developed by industry leaders with input from more than 200 data mining users and data mining tool and service providers, CRISP-DM is an industry-, tool-, and application-neutral model. This model encourages best practices and offers organizations the structure needed to realize better, faster, reproducible results from data mining.\\
 
 CRISP-DM organizes the data mining process into six phases: business understanding, data understanding, data preparation, modeling, evaluation, and deployment. These phases help organizations understand the data mining process and provide a road map to follow while planning and carrying out a data mining project.
 \end{tcolorbox}
 
-#3 Nomograms and the CRISP-DM Model
+**#3 Nomograms and the CRISP-DM Model**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 It’s interesting to note a unique aspect of nomograms in terms of how they fit into the CRISP-DM Model. Predictive data analytics do not usually solve business problems on their own. They generally provide insights which help organizations make apposite decisions and apply them to those problems. The predictions made from nomograms do in fact solve some business problems in health care, namely effectively communicating complex biomedical contexts about patients with them and their families in an effective and low-cost manner. And in this project the business phase of the CRISP-DM Model — predicting survival times for acutely-ill patients modeled on the SUPPORT study — is also the deployment phase, the nomogram itself. \\
 
@@ -60,14 +60,14 @@ For this case study I took a random sample of 1000 patients from the SUPPORT Stu
 His reasoning consisted of parametric survival modeling’s abilities to reliably derive predicted values from patient data according to modeling assumptions which are more transparent than other approaches. And as is the case here, parametric modeling’s approaches to patients’ time-dependent covariates can analyze and interpret them with greater accuracy and reliability than with a semi-parametric Cox model.
 \end{tcolorbox}
 
-#4 Accelerated Failure Time Models
+**#4 Accelerated Failure Time Models**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 The model I'm using is in the class of models referred to as accelerated failure time models because the prognostic modeling for acute patients doesn’t fit the patterns needed for a Cox Proportional Hazard Model. A Cox model tends to be more useful for modeling chronic diseases in which risk factors have more constant effects over time.\\
 
 In the study patients had to survive until Day 3 to qualify for inclusion, and the baselines are the Day 3 measurements. You’ll see descriptive statistics for these measurements at the beginning of the analysis. It's important to note that the age distribution goes all the way from 18 years to 95 years, and is a very nice distribution for this case study. The vast majority of subjects were in the intensive care unit (ICU).
 \end{tcolorbox}
 
-#5 Libraries and the Computing Environment
+**#5 Libraries and the Computing Environment**
 \begin{tcolorbox}[width=\textwidth]
 Here you scrub the environment, load libraries for visualizations, attach required special transformation and analytic functions from the apposite packages (rms and Hmisc), then scrub the console.\\
 
@@ -86,7 +86,7 @@ rm(list = ls())
 cat("\014")
 ```
 
-#6 The SUPPORT Study
+**#6 The SUPPORT Study**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 There’s a lot of information in this dataset and the patients are well-characterized by these data.\\
 
@@ -114,7 +114,7 @@ acute <- support$dzclass %in% c('ARF/MOSF', 'Coma')
 # describe(support[acute,])
 ```
 
-#7 Hierarchical Cluster Analysis: Showing Patterns in any Missing Data
+**#7 Hierarchical Cluster Analysis: Showing Patterns in any Missing Data**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 The varclus() function from Hmisc performs a hierarchical cluster analysis.\\
 
@@ -133,7 +133,7 @@ plot(naclus(support[acute, ]))
 ```
 
 
-#8 Detecting statistical associations between variables
+**#8 Detecting statistical associations between variables**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Here you conduct a variable clustering, in addition to the one above, to see which variables' values may be similar to one another.\\
 
@@ -182,7 +182,7 @@ vc <- varclus(
 plot(vc)                
 ```
 
-#9 Verifying variables' reference ranges
+**#9 Verifying variables' reference ranges**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 After creating a new data subset for modeling you can create boxplots for each variable when apposite, with explanations for what clearly appear to be outliers in the data.\\
 
@@ -272,7 +272,7 @@ death, sex, death in hospital (hospdead), days study entry to discharge (slos), 
 # boxplot(ac$urine, xlab = "Urine Output")
 ```
 
-#10 Choosing a Tentative Model
+**#10 Choosing a Tentative Model**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Here you can make a tentative model choice of a log normal accelerated failure time model. This model choice would be ordinary linear regression if the study did not involve any censoring. There is censoring here because patients who were not followed up on until their deaths were censored at their last contact date.\\
 
@@ -324,7 +324,7 @@ survplot(npsurv(S ~ dzgroup),
          logt = TRUE)
 ```
 
-#11 Calculating the tentative model's residuals
+**#11 Calculating the tentative model's residuals**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Moving on to calculating the tentative model's residuals, when there is censored data in a log normal survival model you can consider that if someone was followed until death the residuals would have the the usual meaning: the log survival time minus the predicted log survival time. But if someone has lost a follow up before some event like death the survival time is right censored and the residual is right censored as well.\\
 
@@ -369,7 +369,7 @@ label(random) <- 'Random Number'
 survplot(r, random, label.curve = FALSE)
 ```
 
-#12 Building the accelerated failure time parametric survival time model 
+**#12 Building the accelerated failure time parametric survival time model**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Next you begin by building the accelerated failure time parametric survival model. A big part of building this model is getting the subject matter input about which of the variables should be used as predictors and another big part is how to assign degrees of freedom to those variables. \\
 
@@ -424,7 +424,7 @@ w <- spearman2(
 plot(w, main = '') 
 ```
 
-#13 A better approach to take censoring into account
+**#13 A better approach to take censoring into account**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 You can use a different rank correlation coefficient, Somer’s Dxy, which has been adapted to handle right censoring. When calculating concordant and discordant numbers that go into all possible pairs analysis with Somer’s D we can take partial information into account.\\
 
@@ -453,7 +453,7 @@ w <- rcorrcens(
 plot(w, main = '') 
 ```
 
-#14 Simple Imputation
+**#14 Simple Imputation**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Here is code for simple imputation based on sound statistical principles and meaningful research.\\
 
@@ -503,7 +503,7 @@ race2[is.na(race2)] <- 'white'
 dd <- datadist(dd, wblc.i, pafi.i, ph.i, race2)
 ```
 
-#15 Redundancy Analysis
+**#15 Redundancy Analysis**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 After data imputation the data is ready for a formal multivariable redundancy analysis. This takes each of the potential predictor variables and attempts to predict each from the others.\\
 
@@ -534,7 +534,7 @@ redun(
 )
 ```
 
-#16 Avoiding Bias: Fit the PSM and conduct an ANOVA
+**#16 Avoiding Bias: Fit the PSM and conduct an ANOVA**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Bias is a type of systemic or systematic error. A satisfaction questionnaire that leads patients to never report that they are dissatisfied with their medical care is an example of bias. It typically pertains to the discrepancy between the average of many estimates over repeated sampling and the true value of a parameter. Bias of this general type is on the surface more related to frequentist statistics than to Bayesian statistics.\\
 
@@ -576,7 +576,7 @@ f <- psm(
 plot(anova(f))
 ```
 
-#17 From the output from the model we see:
+**#17 From the output from the model we see:**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 There were 537 observations, we didn’t have any observations discarded due to missing data.\\
 
@@ -616,7 +616,7 @@ a <- anova(f)
 print(a)
 ```
 
-#18 Summary of the Fitted Model
+**#18 Summary of the Fitted Model**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Partial effects are very good because they handle non-linearity and they illustrate the whole estimated shape of each variable while changing one variable at a time.\\
 
@@ -661,7 +661,7 @@ ggplot(
 )
 ```
 
-#19 Wald Statistics
+**#19 Wald Statistics**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Then there are the nonlinear effects. Looking at serum creatinine, it has an overall chi squared with 3 df of 21.27 adjusted for everything else, which is highly significant. A lot of that significance came from its highly significant nonlinear effect.\\
 
@@ -675,7 +675,7 @@ The total nonlinearity is 60 with 14 degrees of freedom so, there is very good e
 print(a, size = 'tsz')
 ```
 
-#20 Plotting the ANOVA
+**#20 Plotting the ANOVA**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Plotting the ANOVA is where we see that disease group is the biggest predictor. This is similar to before when the model was saturated and you could assume more degrees of freedom for some of the variables.\\
 
@@ -685,7 +685,7 @@ This provides us with a brief look/snapshot of the variables involved in predict
 plot(a) 
 ```
 
-#21 The Summary function
+**#21 The Summary function**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 The summary function is used with the option log equals true which produces a prediction with the log normal accelerated failure time model for log survival time — if you anti-log that you’re getting predicted median survival time, and the effect ratios that are wanted are going to be ratios of median survival time. If the standard deviation is constant these are also ratios of mean survival time. Therefore I used a log scale for plotting.\\
 
@@ -706,7 +706,7 @@ options(digits = 3)
 plot(summary(f), log = TRUE, main = '')
 ```
 
-#22 Internal Validation of the Fitted Model Using the Bootstrap
+**#22 Internal Validation of the Fitted Model Using the Bootstrap**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 The bootstrap is a simulation technique for studying properties of statistics without the need to have a theoretical infinite population available. The most common use of the bootstrap involves taking random samples (with replacement) from the original dataset and studying how some quantity of interest varies.\\
 
@@ -759,7 +759,7 @@ suppressWarnings({
 ```
 
 
-#23 Validate the absolute predictive accuracy
+**#23 Validate the absolute predictive accuracy**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 The next step is to validate the absolute predictive accuracy of the model on the survival probability scale.\\ 
 
@@ -800,7 +800,7 @@ suppressWarnings({
 })
 ```
 
-#24 Simplifying the Full Model
+**#24 Simplifying the Full Model**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 For some use cases parsimony is an important factor. Because it attenuates the quality of predicted discrimination it's a good idea to avoid it. And in the modern computer age you have predictions based on electronic medical record systems which don’t need to be parsimonious. If you’re trying to use something in the field, however, where you’re trying to save time and money collecting data, there can be good use cases for parsimonious models.\\
 
@@ -845,7 +845,7 @@ a <- ols(
 fastbw(a, aics = 10000)  
 ```
 
-#25 Fitting an approximate Ordinary Least Squares model
+**#25 Fitting an approximate Ordinary Least Squares model**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Here you have to fit an approximate Ordinary Least Squares model in order to predict the predicted values using the the subset of variables which were retained in the less complex model. That model presents the same R squared (.957) as the full model.\\
 
@@ -884,7 +884,7 @@ f.approx <- ols(
 f.approx$stats
 ```
 
-#26 Mapping the full model's coefficients onto the approximate model coefficients
+**#26 Mapping the full model's coefficients onto the approximate model coefficients**
 \begin{tcolorbox}[width=\textwidth]
 1. This returns the variance-covariance matrix of the main parameters of a fitted model object — in this case the full model.\\
 
@@ -913,7 +913,7 @@ w <- solve(t(x) %*% x, t(x)) %*% X
 v <- w %*% V %*% t(w)
 ```
 
-#27 Approximate model's estimated variances
+**#27 Approximate model's estimated variances**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Here you compare the variance estimates — the diagonals of v — with variance estimates from the reduced model ﬁtted against the actual outcomes.\\
 
@@ -943,7 +943,8 @@ diag(v) / diag(vcov(f.sub, regcoef.only = TRUE))
 r <- diag(v) / diag(vcov(f.sub, regcoef.only = TRUE))
 r[c(which.min(r), which.max(r))]
 ```
-#28 The Wald statistics for the reduced model
+
+**#28 The Wald statistics for the reduced model**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 1. Mapping the full model's variances onto the approximate model’s variances.\\
 
@@ -958,7 +959,7 @@ f.approx$var <- v
 print(anova(f.approx, test = 'Chisq', ss = FALSE), size = 'tsz')
 ```
 
-#29 The final equation on which the nomogram is based:
+**#29 The final equation on which the nomogram is based:**
 $$E(Z) = X*\beta,\ where$$
 
 $$X*\hat{\beta}=-2.51 -1.94[{\rm Coma}]-1.75[{\rm MOSF\ w/Malig}] + 0.068{\rm meanbp}_{+}$$
@@ -979,7 +980,7 @@ $$+0.000176 ({\rm resp}-24)_{+}^{3}-8.5\times\!10^{-5 }({\rm resp}-39)_{+}^{3}  
 $$and\ \ [c]=1\ \ if\ \ subject\ \ is\ \ in\ \ group\ \ (c), $$
 $$\ \ 0\ \ otherwise\ \ (x)_{+}=x\ \ if \ \ x > 0,\ \ 0\ \ otherwise$$
 
-#30 A simpler representation of the model
+**#30 A simpler representation of the model**
 \begin{tcolorbox}[width=\textwidth, colback={yellow}]
 Now you’ve cut out variables which are not  accurately predictive of the predicted values from the full model. Once you fit your model you can get more types of predictive quantities from a parametric model than you can from a Cox Proportional Hazards semi-parametric model. You can’t really get a mean survival time from a Cox model unless everyone is followed until death or perhaps if your censoring for those still alive is very, very late.\\
 
@@ -1022,7 +1023,7 @@ The mean survival time when the median is 1 is about 10 years, so the distributi
 
 4. Plot it. 
 \end{tcolorbox}
-#31 The Nomogram
+**#31 The Nomogram**
 ```{r}
 # 1
 expected.surv <- Mean(f)
